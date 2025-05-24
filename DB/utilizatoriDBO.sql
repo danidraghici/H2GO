@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[utilizatori]    Script Date: 21.05.2025 18:11:21 ******/
+/****** Object:  Table [dbo].[utilizatori]    Script Date: 24.05.2025 16:16:24 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -15,9 +15,14 @@ CREATE TABLE [dbo].[utilizatori](
 	[id_permisiune] [int] NOT NULL,
 	[data_crearii] [date] NOT NULL,
 	[ultima_logare] [date] NOT NULL,
+	[CNP] [char](13) NOT NULL,
  CONSTRAINT [PK_utilizatori] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
+)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+ CONSTRAINT [IX_utilizatori] UNIQUE NONCLUSTERED 
+(
+	[CNP] ASC
 )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
