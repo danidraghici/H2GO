@@ -1,0 +1,324 @@
+.e1_6 { 
+	background-color:rgba(255, 255, 255, 1);
+	width:1440px;
+	height:1024px;
+	position:absolute;
+}
+@media screen and (max-width: 600px) {
+	.e1_6 { 
+		width: 100%;
+		height: auto;
+	}
+  }
+/*dreapta*/
+.e4_14dr { 
+	background-color:rgb(255, 255, 255);
+	width: 50%;
+	height: 100%;
+	position: fixed;
+	left:50%;
+	top:0px;
+}
+@media screen and (max-width: 768px) {
+	.e4_14dr {
+		width: 100%;
+	}
+}
+.e44_174 { 
+	width:979px;
+	height:319px;
+	position:absolute;
+	top: 50%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+}
+.e4_6 { 
+	width:979px;
+	height:253px;
+	position:absolute;
+	top: 50%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+	background-image:url(../images/heartbitlogo_1.png);
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.e4_13 { 
+	color:rgba(139.0000069141388, 0, 0, 1);
+	width:396px;
+	height:113px;
+	position:absolute;
+	top: 11%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+	font-family:Adamina;
+	text-align:center;
+	font-size:64px;
+	letter-spacing:0;
+}
+.e4_7 { 
+	width:718px;
+	height:186px;
+	position:absolute;
+	top: 57%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+	background-image:url(../images/heartbitlogo_2.png);
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+/*stanga*/
+.e4_14 { 
+	background-color:rgba(238.00000101327896, 233.00000131130219, 231.00000143051147, 1);
+	width: 50%;
+	height: 100%;
+	position: fixed;
+	left:0px;
+	top:0px;
+}
+@media screen and (max-width: 768px) {
+	.e4_14 {
+		width: 100%;
+	}
+}
+.e43_163 { 
+	width:419px;
+	height:420.2525329589844px;
+	position:absolute;
+	top: 50%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+}
+
+.e4_28 { 
+	color:rgba(0, 0, 0, 1);
+	width:107px;
+	height:19px;
+	position:absolute;
+	left:280px;
+	top:325px;
+	font-family:Adamina;
+	text-align:center;
+	font-size:14px;
+	letter-spacing:0;
+}
+.e4_29 { 
+	background-color:rgba(0, 0, 0, 1);
+	width:16px;
+	height:16px;
+	position:absolute;
+	left:31px;
+	top:325px;
+}
+.e4_30 { 
+	color:rgba(0, 0, 0, 1);
+	width:99px;
+	height:19px;
+	position:absolute;
+	left:60px;
+	top:325px;
+	font-family:Adamina;
+	text-align:center;
+	font-size:14px;
+	letter-spacing:0;
+}
+.e4_19 { 
+	width:358.4861145019531px;
+	height:93.28573608398438px;
+	position: absolute;
+	left:30px;
+	top:82px;
+}
+.e4_20 { 
+	width:358.4861145019531px;
+	height:50.69500732421875px;
+	position:absolute;
+	left:0px;
+	top:42.590728759765625px;
+}
+.ei4_20_4_17 { 
+	background-color:rgba(255, 255, 255, 1);
+	width:358.4861145019531px;
+	height:50.69500732421875px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	font-family:Adamina;
+    font-size: 21px;
+}
+.e4_21 { 
+	color:rgba(0, 0, 0, 1);
+	width:312.61920166015625px;
+	height:36.986663818359375px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	font-family:Adamina;
+	text-align:left;
+	font-size:24px;
+	letter-spacing:0;
+}
+/*autentificare*/
+.e4_10 { 
+	width:419px;
+	height:59.252525329589844px;
+	position: absolute;
+	left:0px;
+	top:361px;
+}
+.e4_11 { 
+	box-shadow:0px 4px 4px rgba(0, 0, 0, 0.25);
+	background-color:rgba(0, 132.8124949336052, 6.213457938283682, 1);
+	width:419px;
+	height:59.252525329589844px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	border-top-left-radius:37px;
+	border-top-right-radius:37px;
+	border-bottom-left-radius:37px;
+	border-bottom-right-radius:37px;
+}
+.e4_11:hover { 
+	background-color:rgb(13, 151, 20);
+}
+.e4_11:active { 
+	background-color:rgb(8, 105, 13);
+}
+#e4_12 { 
+	color:rgba(255, 255, 255, 1);
+	position:absolute;
+	font-family:Adamina;
+	text-align:center;
+	font-size:24px;
+	letter-spacing:0;
+}
+/*creare cont medic*/
+.e4_80 { 
+	width:200px;
+	height:59.252525329589844px;
+	position: absolute;
+	left:0px;
+	top:431px;
+}
+.e4_81 { 
+	box-shadow:0px 4px 4px rgba(0, 0, 0, 0.25);
+	background-color:#8b0000;
+	width:200px;
+	height:59.252525329589844px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	border-top-left-radius:37px;
+	border-top-right-radius:37px;
+	border-bottom-left-radius:37px;
+	border-bottom-right-radius:37px;
+}
+.e4_81:hover { 
+	background-color:#c22323;
+}
+.e4_81:active { 
+	background-color:#4b0000;
+}
+.e4_82 { 
+	color:rgba(255, 255, 255, 1);
+	position:absolute;
+	font-family:Adamina;
+	text-align:center;
+	font-size:20px;
+	letter-spacing:0;
+	left:10px;
+	top:13px;
+}
+/*creare cont pacient*/
+.e4_90 { 
+	width:200px;
+	height:59.252525329589844px;
+	position: absolute;
+	left:217px;
+	top:431px;
+}
+.e4_91 { 
+	box-shadow:0px 4px 4px rgba(0, 0, 0, 0.25);
+	background-color:#8b0000;
+	width:200px;
+	height:59.252525329589844px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	border-top-left-radius:37px;
+	border-top-right-radius:37px;
+	border-bottom-left-radius:37px;
+	border-bottom-right-radius:37px;
+}
+.e4_91:hover { 
+	background-color:#c22323;
+}
+.e4_91:active { 
+	background-color:#4b0000;
+}
+.e4_92 { 
+	color:rgba(255, 255, 255, 1);
+	position:absolute;
+	font-family:Adamina;
+	text-align:center;
+	font-size:20px;
+	letter-spacing:0;
+	left:8px;
+	top:13px;
+}
+.e4_15 { 
+	width:358.4861145019531px;
+	height:93.28573608398438px;
+	position: absolute;
+	left:30px;
+	top:212px;
+}
+.e6_4 { 
+	width:358.4861145019531px;
+	height:50.69500732421875px;
+	position:absolute;
+	left:0px;
+	top:42.590728759765625px;
+}
+.ei6_4_4_17 { 
+	background-color:rgba(255, 255, 255, 1);
+	width:358.4861145019531px;
+	height:50.69500732421875px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	font-family:Adamina;
+    font-size: 21px;
+}
+.ei6_4_4_23 {
+	width:22.916667938232422px;
+	height:19.79166603088379px;
+	position:absolute;
+	left:319px;
+	top:15.409271240234375px;
+}
+.e4_18 { 
+	color:rgba(0, 0, 0, 1);
+	width:312.61920166015625px;
+	height:36.986663818359375px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	font-family:Adamina;
+	text-align:left;
+	font-size:24px;
+	letter-spacing:0;
+}
+.e4_32 { 
+	color:rgba(139.0000069141388, 0, 0, 1);
+	width:250px;
+	height:54px;
+	position:absolute;
+	font-family:Adamina;
+	text-align:center;
+	font-size:40px;
+	letter-spacing:0;
+	left:84px;
+	top:0px;
+}
