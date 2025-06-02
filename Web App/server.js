@@ -44,7 +44,7 @@ app.post('/api/login', async (req, res) => {
 
         // const token = jwt.sign({ id: user.ID, email: user.Email }, JWT_SECRET, { expiresIn: '1h' });
 
-        res.status(200).json({ success: true, user: { id: user.ID, email: user.Email, userType: user.rol } });
+        res.status(200).json({ success: true, user: { id: user.ID, email: user.Email, userType: user.rol, cnp: user.CNP } });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
@@ -85,6 +85,102 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// returneaza pacientii unui medic
+app.get('/api/getPacienti', async (req, res) => {
+    const cnpMedic = req.query.cnpMedic;
+
+    try {
+        await sql.connect(config);
+        const result = await sql.query`SELECT * FROM Pacienti WHERE cnp_medic = ${cnpMedic}`;
+        res.json({ success: true, pacienti: result.recordset });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Eroare la obținerea pacienților' });
+    }
+});
+
+// adauga pacient
+app.post('/api/addPacienti', async (req, res) => {
+    const {
+        cnp,
+        nume,
+        prenume,
+        sex,
+        data_nasterii,
+        adresa,
+        telefon,
+        email,
+        password,
+        cnpMedic
+    } = req.body;
+
+    if (!cnp || !nume || !prenume || !sex || !data_nasterii || !adresa || !telefon || !email || !password || !cnpMedic) {
+        return res.status(400).json({ success: false, message: 'Toate câmpurile sunt obligatorii.' });
+    }
+
+    try {
+        await sql.connect(config);
+
+        // Verifică dacă pacientul există deja (după CNP sau email) în tabela `pacienti`
+        const existing = await sql.query`
+            SELECT * FROM pacienti WHERE CNP = ${cnp} OR Email = ${email}
+        `;
+
+        if (existing.recordset.length > 0) {
+            return res.status(400).json({ success: false, message: 'Pacientul există deja' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+
+        await sql.query`
+            INSERT INTO pacienti (
+                CNP, Nume, Prenume, Sex, Data_nasterii, Adresa, Telefon, Email, Status_activ, CNP_medic
+            ) VALUES (
+                ${cnp}, ${nume}, ${prenume}, ${sex}, ${data_nasterii}, ${adresa},
+                ${telefon}, ${email}, ${true}, ${cnpMedic}
+            )
+        `;
+
+        res.status(201).json({ success: true });
+    } catch (err) {
+        console.error('Eroare la adăugarea pacientului:', err);
+        res.status(500).json({ success: false, message: 'Eroare la adăugarea pacientului' });
+    }
+});
+
+
+
+// actualizeaza un pacient
+app.put('/api/pacienti/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nume, email } = req.body;
+
+    try {
+        await sql.connect(config);
+        await sql.query`
+            UPDATE Pacienti SET nume = ${nume}, email = ${email} WHERE id = ${id}
+        `;
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Eroare la actualizarea pacientului' });
+    }
+});
+
+// sterge un pacient
+app.delete('/api/pacienti/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await sql.connect(config);
+        await sql.query`DELETE FROM Pacienti WHERE id = ${id}`;
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Eroare la ștergerea pacientului' });
+    }
+});
 
 
 app.listen(3000, () => console.log('API server running on port 3000'));
