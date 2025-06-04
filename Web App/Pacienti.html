@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Pacienții Mei</title>
+    <script type="module" src="Pacienti.js" defer></script>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        .modal {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); background: white;
+            padding: 20px; border: 1px solid #ccc; z-index: 1000;
+        }
+        .modal.active { display: block; }
+        .overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .overlay.active { display: block; }
+    </style>
+</head>
+<body>
+<h1>Pacienții Mei</h1>
+
+<input type="text" id="searchInput" placeholder="Caută după nume..." />
+
+<div id="paginationControls">
+    <button id="prevPage">Anterior</button>
+    <span id="currentPage">Pagina 1</span>
+    <button id="nextPage">Următor</button>
+</div>
+
+<div class="e4_90">
+    <a href="ContPacient.html" class="e4_91">
+        <div class="e4_92">Creare cont pacient</div>
+    </a>
+</div>
+
+<table id="patientsTable">
+    <thead>
+    <tr>
+        <th>CNP</th>
+        <th>Nume</th>
+        <th>Prenume</th>
+        <th>Sex</th>
+        <th>Data nașterii</th>
+        <th>Adresă</th>
+        <th>Telefon</th>
+        <th>Email</th>
+        <th>Status Activ</th>
+        <th>Acțiuni</th>
+    </tr>
+    </thead>
+    <tbody id="patientsList">
+    </tbody>
+</table>
+
+<!-- Modal pentru editare -->
+<div class="overlay" id="overlay"></div>
+<div class="modal" id="editModal">
+    <h3>Editează pacient</h3>
+    <form id="editForm">
+        <input type="hidden" id="editCNP">
+        <label>Nume: <input type="text" id="editNume"></label><br>
+        <label>Prenume: <input type="text" id="editPrenume"></label><br>
+        <label>Email: <input type="email" id="editEmail"></label><br>
+        <label>Telefon: <input type="text" id="editTelefon"></label><br>
+        <label>Adresă: <input type="text" id="editAdresa"></label><br>
+        <label>Status Activ:
+            <select id="editStatus">
+                <option value="1">Activ</option>
+                <option value="0">Inactiv</option>
+            </select>
+        </label><br><br>
+        <button type="submit">Salvează</button>
+        <button type="button" onclick="closeModal()">Anulează</button>
+    </form>
+</div>
+</body>
+</html>
