@@ -123,7 +123,7 @@ app.post('/api/addPacienti', async (req, res) => {
 
         // Verifică dacă pacientul există deja (după CNP sau email) în tabela `pacienti`
         const existing = await sql.query`
-            SELECT * FROM pacienti WHERE CNP = ${cnp} OR Email = ${email}
+            SELECT * FROM pacienti WHERE CNP = ${cnp}
         `;
 
         if (existing.recordset.length > 0) {
@@ -179,6 +179,45 @@ app.delete('/api/pacienti/:id', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Eroare la ștergerea pacientului' });
+    }
+});
+
+
+app.get('/api/pacienti/:cnp', async (req, res) => {
+    const cnp = req.params.cnp;
+    try {
+        await sql.connect(config);
+        const result = await sql.query`SELECT * FROM Pacienti WHERE CNP = ${cnp}`;
+        if (result.recordset.length > 0) {
+            res.json(result.recordset[0]);
+        } else {
+            res.status(404).json({ message: 'Pacientul nu a fost găsit' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Eroare la obținerea pacientului' });
+    }
+});
+
+app.put('/api/pacienti/:cnp', async (req, res) => {
+    const cnp = req.params.cnp;
+    const { nume, prenume, email, telefon, adresa, status_activ } = req.body;
+    try {
+        await sql.connect(config);
+        await sql.query`
+            UPDATE Pacienti SET 
+                Nume = ${nume}, 
+                Prenume = ${prenume},
+                Email = ${email},
+                Telefon = ${telefon},
+                Adresa = ${adresa},
+                Status_activ = ${status_activ}
+            WHERE CNP = ${cnp}
+        `;
+        res.json({ message: 'Pacient actualizat cu succes' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Eroare la actualizarea pacientului' });
     }
 });
 
