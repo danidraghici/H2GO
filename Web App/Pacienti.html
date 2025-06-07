@@ -3,34 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Pacienții Mei</title>
-    <script type="module" src="Pacienti.js" defer></script>
+    <link rel="stylesheet" href="./css/Pacienti.css" />
+    <script type="module" src="Pacienti.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
         th { background-color: #f2f2f2; }
-        .modal {
-            display: none; position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); background: white;
-            padding: 20px; border: 1px solid #ccc; z-index: 1000;
-        }
-        .modal.active { display: block; }
-        .overlay {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-        .overlay.active { display: block; }
     </style>
 </head>
 <body>
 <h1>Pacienții Mei</h1>
 
 <input type="text" id="searchInput" placeholder="Caută după nume..." />
-
-<div id="paginationControls">
-    <button id="prevPage">Anterior</button>
-    <span id="currentPage">Pagina 1</span>
-    <button id="nextPage">Următor</button>
-</div>
 
 <div class="e4_90">
     <a href="ContPacient.html" class="e4_91">
@@ -49,6 +33,8 @@
         <th>Adresă</th>
         <th>Telefon</th>
         <th>Email</th>
+        <th>Ultima Programare</th>
+        <th>Ultimul Tratament</th>
         <th>Status Activ</th>
         <th>Acțiuni</th>
     </tr>
@@ -57,26 +43,86 @@
     </tbody>
 </table>
 
+<div id="paginationControls">
+    <button id="prevPage">Anterior</button>
+    <span id="currentPage">Pagina 1</span>
+    <button id="nextPage">Următor</button>
+</div>
+
 <!-- Modal pentru editare -->
-<div class="overlay" id="overlay"></div>
 <div class="modal" id="editModal">
-    <h3>Editează pacient</h3>
+    <h2>Editează pacient</h2>
     <form id="editForm">
-        <input type="hidden" id="editCNP">
-        <label>Nume: <input type="text" id="editNume"></label><br>
-        <label>Prenume: <input type="text" id="editPrenume"></label><br>
-        <label>Email: <input type="email" id="editEmail"></label><br>
-        <label>Telefon: <input type="text" id="editTelefon"></label><br>
-        <label>Adresă: <input type="text" id="editAdresa"></label><br>
-        <label>Status Activ:
-            <select id="editStatus">
-                <option value="1">Activ</option>
-                <option value="0">Inactiv</option>
-            </select>
-        </label><br><br>
+        <button onclick="closeModal()">X</button>
+        <!-- Detalii pacient -->
+        <div class="section">
+            <h4>Detalii pacient</h4>
+            <label>CNP: <input type="text" id="editCNP" disabled></label>
+            <label>Nume: <input type="text" id="editNume"></label>
+            <label>Prenume: <input type="text" id="editPrenume"></label>
+            <label>Data nașterii: <input type="date" id="editDataNasterii" disabled></label>
+            <label>Sex:
+                <select id="editSex" disabled>
+                    <option value="M">Masculin</option>
+                    <option value="F">Feminin</option>
+                </select>
+            </label>
+            <label>Adresă: <input type="text" id="editAdresa"></label>
+            <label>Email: <input type="text" id="editEmail"></label>
+            <label>Telefon: <input type="text" id="editTelefon"></label>
+        </div>
+
+        <!-- Date specificate medic-->
+        <div class="section">
+            <h4>Date conform ultimelor consultatii</h4>
+        <label>Status: <select id="editStatus">
+            <option value="1">Activ</option>
+            <option value="0">Inactiv</option>
+        </select>
+        </label>
+        <table id="tabelPraguri">
+            <thead>
+            <tr>
+                <th>Puls (min - max)</th>
+                <th>Temperatură (min - max)</th>
+                <th>Umiditate (min - max)</th>
+                <th>EKG (min - max)</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table></div>
+
         <button type="submit">Salvează</button>
-        <button type="button" onclick="closeModal()">Anulează</button>
+
+        <!-- Date monitorizate -->
+        <div class="section">
+            <h4>Date monitorizate de senzori</h4>
+            <p>Puls: <span id="pulseVal"></span> bpm</p>
+            <p>Temperatură: <span id="tempVal"></span> °C</p>
+            <p>Umiditate: <span id="humidityVal"></span> %</p>
+            <canvas id="ecgChart" width="600" height="200"></canvas>
+        </div>
+
+        <!-- Ultima consultatie -->
+        <div class="section">
+            <h4>Ultima programare și consultație</h4>
+            <p>Data: <span id="ultimaConsultatieData"></span></p>
+            <p>Tip: <span id="tipConsultatie"></span></p>
+            <p>Diagnostic preliminar: <span id="diagnosticPreliminar"></span></p>
+            <p>Observații: <span id="observatii"></span></p>
+            <p>Recomandări: <span id="recomandari"></span></p>
+        </div>
+
+        <!-- Ultimul tratament -->
+        <div class="section">
+            <h4>Ultimul tratament</h4>
+            <p>Medicament: <span id="medicament"></span></p>
+            <p>Formă farmaceutică: <span id="formaFarmaceutica"></span></p>
+            <p>Posologie: <span id="posologie"></span></p>
+            <p>Ultima prescriere: <span id="ultimaPrescriere"></span></p>
+        </div>
     </form>
 </div>
+
 </body>
 </html>
