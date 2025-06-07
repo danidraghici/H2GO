@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[praguri_masuratori]    Script Date: 07.06.2025 14:57:20 ******/
+/****** Object:  Table [dbo].[praguri_masuratori]    Script Date: 07.06.2025 21:06:58 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -6,7 +6,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[praguri_masuratori](
-	[id] [int] NOT NULL,
+	[id] [int] IDENTITY(1,1) NOT NULL,
 	[cnp_pacient] [char](13) NOT NULL,
 	[limita_minima_puls] [numeric](10, 2) NOT NULL,
 	[limita_maxima_puls] [numeric](10, 2) NOT NULL,
