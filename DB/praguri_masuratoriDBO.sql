@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[praguri_masuratori]    Script Date: 07.06.2025 21:06:58 ******/
+/****** Object:  Table [dbo].[praguri_masuratori]    Script Date: 07.06.2025 22:57:17 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -14,7 +14,7 @@ CREATE TABLE [dbo].[praguri_masuratori](
 	[limita_maxima_temperatura] [numeric](10, 2) NOT NULL,
 	[limita_minima_ekg] [numeric](10, 2) NOT NULL,
 	[limita_maxima_ekg] [numeric](10, 2) NOT NULL,
-	[cnp_doctor] [char](13) NOT NULL,
+	[cnp_medic] [char](13) NOT NULL,
 	[limita_minima_umiditate] [numeric](10, 2) NOT NULL,
 	[limita_maxima_umiditate] [numeric](10, 2) NOT NULL,
  CONSTRAINT [PK_praguri_masuratori] PRIMARY KEY CLUSTERED 
@@ -31,7 +31,7 @@ GO
 ALTER TABLE [dbo].[praguri_masuratori] CHECK CONSTRAINT [FK_praguri_masuratori_pacienti]
 GO
 
-ALTER TABLE [dbo].[praguri_masuratori]  WITH CHECK ADD  CONSTRAINT [FK_praguri_masuratori_utilizatori] FOREIGN KEY([cnp_doctor])
+ALTER TABLE [dbo].[praguri_masuratori]  WITH CHECK ADD  CONSTRAINT [FK_praguri_masuratori_utilizatori] FOREIGN KEY([cnp_medic])
 REFERENCES [dbo].[utilizatori] ([CNP])
 GO
 
