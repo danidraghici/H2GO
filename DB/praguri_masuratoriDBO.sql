@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[praguri_masuratori]    Script Date: 07.06.2025 14:51:49 ******/
+/****** Object:  Table [dbo].[praguri_masuratori]    Script Date: 07.06.2025 14:57:20 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -15,6 +15,8 @@ CREATE TABLE [dbo].[praguri_masuratori](
 	[limita_minima_ekg] [numeric](10, 2) NOT NULL,
 	[limita_maxima_ekg] [numeric](10, 2) NOT NULL,
 	[cnp_doctor] [char](13) NOT NULL,
+	[limita_minima_umiditate] [numeric](10, 2) NOT NULL,
+	[limita_maxima_umiditate] [numeric](10, 2) NOT NULL,
  CONSTRAINT [PK_praguri_masuratori] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
