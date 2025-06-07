@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[log_modificari]    Script Date: 07.06.2025 16:35:22 ******/
+/****** Object:  Table [dbo].[log_modificari]    Script Date: 07.06.2025 21:13:37 ******/
 SET ANSI_NULLS ON
 GO
 
