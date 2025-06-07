@@ -17,7 +17,12 @@ signinForm.addEventListener('click', async (e) => {
         if (data.success) {
             
             const userType = data.user.userType;
+            const cnpMedic = data.user.cnp;
             localStorage.setItem('userType', userType);
+
+            if (userType === 'medic') {
+                localStorage.setItem('cnpMedic', cnpMedic);
+            }
 
             // Redirect based on user type
             switch (userType) {
