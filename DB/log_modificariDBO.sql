@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[log_modificari]    Script Date: 07.06.2025 11:45:59 ******/
+/****** Object:  Table [dbo].[log_modificari]    Script Date: 07.06.2025 16:35:22 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -6,26 +6,26 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[log_modificari](
-	[id_modificare] [int] IDENTITY(1,1) NOT NULL,
-	[id_utilizator] [uniqueidentifier] NOT NULL,
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[cnp_doctor] [char](13) NOT NULL,
 	[tabela_modificata] [varchar](50) NOT NULL,
 	[coloana_modificata] [varchar](50) NOT NULL,
-	[valoare_veche] [varchar](100) NULL,
-	[valoare_noua] [varchar](100) NULL,
+	[valoare_veche] [varchar](50) NULL,
+	[valoare_noua] [varchar](50) NULL,
 	[data_modificare] [datetime2](3) NOT NULL,
 	[operatie] [varchar](50) NOT NULL,
 	[detalii] [varchar](100) NULL,
- CONSTRAINT [PK_log_modificari] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_logs_modificari] PRIMARY KEY CLUSTERED 
 (
-	[id_modificare] ASC
+	[id] ASC
 )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[log_modificari]  WITH CHECK ADD  CONSTRAINT [FK_ID_UTILIZATOR_LOGS] FOREIGN KEY([id_utilizator])
-REFERENCES [dbo].[utilizatori] ([id])
+ALTER TABLE [dbo].[log_modificari]  WITH CHECK ADD  CONSTRAINT [FK_logs_modificari_utilizatori] FOREIGN KEY([cnp_doctor])
+REFERENCES [dbo].[utilizatori] ([CNP])
 GO
 
-ALTER TABLE [dbo].[log_modificari] CHECK CONSTRAINT [FK_ID_UTILIZATOR_LOGS]
+ALTER TABLE [dbo].[log_modificari] CHECK CONSTRAINT [FK_logs_modificari_utilizatori]
 GO
 
