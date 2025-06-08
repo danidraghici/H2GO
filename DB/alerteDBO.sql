@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[alerte]    Script Date: 08.06.2025 18:28:55 ******/
+/****** Object:  Table [dbo].[alerte]    Script Date: 08.06.2025 19:20:22 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -6,13 +6,13 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[alerte](
-	[id] [uniqueidentifier] NOT NULL,
 	[cnp_pacient] [char](13) NOT NULL,
 	[masurare_id] [int] NOT NULL,
 	[mesaj] [text] NOT NULL,
 	[severitate] [varchar](50) NOT NULL,
 	[status] [varchar](50) NOT NULL,
 	[data_generare] [date] NOT NULL,
+	[id] [int] IDENTITY(1,1) NOT NULL,
  CONSTRAINT [PK_alerte] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
