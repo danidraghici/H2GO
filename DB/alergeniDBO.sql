@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[alergeni]    Script Date: 08.06.2025 18:28:36 ******/
+/****** Object:  Table [dbo].[alergeni]    Script Date: 08.06.2025 18:47:40 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -17,6 +17,13 @@ CREATE TABLE [dbo].[alergeni](
 	[id] ASC
 )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[alergeni]  WITH CHECK ADD  CONSTRAINT [FK_alergeni_pacienti] FOREIGN KEY([cnp_pacient])
+REFERENCES [dbo].[pacienti] ([CNP])
+GO
+
+ALTER TABLE [dbo].[alergeni] CHECK CONSTRAINT [FK_alergeni_pacienti]
 GO
 
 ALTER TABLE [dbo].[alergeni]  WITH CHECK ADD  CONSTRAINT [FK_CNP_DOCTOR_ALERGENI] FOREIGN KEY([cnp_doctor])
