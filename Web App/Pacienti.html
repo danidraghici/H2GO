@@ -4,25 +4,25 @@
     <meta charset="UTF-8">
     <title>Pacienții Mei</title>
     <link rel="stylesheet" href="./css/Pacienti.css" />
-    <script type="module" src="Pacienti.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
-        th { background-color: #f2f2f2; }
-    </style>
 </head>
 <body>
-<h1>Pacienții Mei</h1>
+<h1>Pacienții Mei
+    <div class="e4_90" style="display: flex">
+        <a href="WelcomeMedic.html">
+            <button class="e4_92" style="padding-left: 20px">Acasa</button>
+        </a>
+        <a href="ContPacient.html" class="e4_91">
+            <button class="e4_92" style="margin-left: 1650px">Creare cont pacient</button>
+        </a>
+    </div></h1>
+
+
 
 <input type="text" id="searchInput" placeholder="Caută după nume..." />
 
-<div class="e4_90">
-    <a href="ContPacient.html" class="e4_91">
-        <div class="e4_92">Creare cont pacient</div>
-    </a>
-</div>
 
-<table id="patientsTable">
+<table id="patientsTable" style="width: 100%">
     <thead>
     <tr>
         <th>CNP</th>
@@ -51,9 +51,11 @@
 
 <!-- Modal pentru editare -->
 <div class="modal" id="editModal">
-    <h2>Editează pacient</h2>
+    <h2>Editează pacient
+        <button onclick="closeModal()" style="margin-left: 1650px">X</button>
+    </h2>
     <form id="editForm">
-        <button onclick="closeModal()">X</button>
+
         <!-- Detalii pacient -->
         <div class="section">
             <h4>Detalii pacient</h4>
@@ -111,7 +113,7 @@
             <p>Diagnostic preliminar: <span id="diagnosticPreliminar"></span></p>
             <p>Observații: <span id="observatii"></span></p>
             <p>Recomandări: <span id="recomandari"></span></p>
-            <button onclick="closeModal()">Adauga Consultatie</button>
+            <button onclick="adaugaConsultatie()">Adauga Consultatie</button>
         </div>
 
         <!-- Ultimul tratament -->
@@ -125,5 +127,6 @@
     </form>
 </div>
 
+<script src="Pacienti.js"></script>
 </body>
 </html>

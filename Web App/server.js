@@ -520,4 +520,56 @@ app.post('/api/update-praguri', async (req, res) => {
     }
 });
 
+app.post('/api/consultatii', async (req, res) => {
+    const cnp_pacient = req.query.cnp_pacient;
+    const cnp_doctor = req.query.cnp_medic;
+
+    console.log(cnp_pacient);
+    if (!cnp_pacient) {
+        return res.status(400).json({ message: "CNP pacient lipsă." });
+    }
+
+    const { diagnostic, tratament, recomandari, observatii } = req.body;
+    const data_programare = new Date();
+    const data_consultatie = new Date();
+
+    try {
+        const pool = await sql.connect(config);
+
+        // 1. Inserăm programarea
+        const programareResult = await pool.request()
+            .input('cnp_pacient', sql.Char(13), cnp_pacient)
+            .input('cnp_doctor', sql.Char(13), cnp_doctor)
+            .input('data_programare', sql.Date, data_programare)
+            .input('status', sql.VarChar(50), 'finalizata')
+            .input('comentarii', sql.Text, '')
+            .query(`
+                INSERT INTO programari (cnp_pacient, cnp_doctor, data_programare, status, comentarii)
+                OUTPUT INSERTED.id
+                VALUES (@cnp_pacient, @cnp_doctor, @data_programare, @status, @comentarii)
+            `);
+
+        const id_programare = programareResult.recordset[0].id;
+
+        // 2. Inserăm consultația
+        await pool.request()
+            .input('id_programare', sql.Int, id_programare)
+            .input('diagnostic', sql.Text, diagnostic)
+            .input('tratament', sql.Text, tratament)
+            .input('recomandari', sql.Text, recomandari)
+            .input('data_consultatie', sql.DateTime2(3), data_consultatie)
+            .input('observatii', sql.Text, observatii)
+            .query(`
+                INSERT INTO consultatii (id_programare, diagnostic, tratament, recomandari, data_consultatie, observatii)
+                VALUES (@id_programare, @diagnostic, @tratament, @recomandari, @data_consultatie, @observatii)
+            `);
+
+        res.status(201).json({ message: 'Consultația a fost salvată.' });
+    } catch (err) {
+        console.error("Eroare salvare:", err);
+        res.status(500).json({ message: 'Eroare la salvare în baza de date.' });
+    }
+});
+
+
 app.listen(3000, () => console.log('API server running on port 3000'));

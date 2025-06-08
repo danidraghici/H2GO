@@ -2,7 +2,7 @@ const cnpMedic = localStorage.getItem('cnpMedic');
 let cnpPacient = null;
 let allPacienti = [];
 let currentPage = 1;
-const pageSize = 5;
+const pageSize = 8;
 
 let ecgChartInstance = null;
 
@@ -273,6 +273,11 @@ function openModal() {
 
 function closeModal() {
     document.getElementById('editModal').classList.remove('active');
+}
+
+function  adaugaConsultatie() {
+    let pacient = document.getElementById('editCNP').value;
+    window.location.href = `AdaugaConsultatie.html?cnp=${pacient}`;
 }
 
 loadPacienti();
