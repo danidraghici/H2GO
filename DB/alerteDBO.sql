@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[alerte]    Script Date: 08.06.2025 19:20:22 ******/
+/****** Object:  Table [dbo].[alerte]    Script Date: 08.06.2025 23:15:49 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -11,7 +11,7 @@ CREATE TABLE [dbo].[alerte](
 	[mesaj] [text] NOT NULL,
 	[severitate] [varchar](50) NOT NULL,
 	[status] [varchar](50) NOT NULL,
-	[data_generare] [date] NOT NULL,
+	[data_generare] [datetime2](3) NULL,
 	[id] [int] IDENTITY(1,1) NOT NULL,
  CONSTRAINT [PK_alerte] PRIMARY KEY CLUSTERED 
 (
