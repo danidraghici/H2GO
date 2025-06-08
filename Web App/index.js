@@ -1,5 +1,5 @@
-var signinForm = document.querySelector('#login');
-signinForm.addEventListener('click', async (e) => {
+var signinForm = document.querySelector('#loginForm');
+signinForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const email = document.getElementById('email').value;

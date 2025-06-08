@@ -5,7 +5,7 @@
     width: 100vw;
     height: 100vh;
     background: white;
-    padding-left: 40px;
+    padding-left: 20px;
     overflow-y: scroll;
     z-index: 1000;
     display: none;
@@ -32,7 +32,57 @@ label {
 
 #ecgChart {
     width: 100%;
-    max-width: 80%;     /* limitează lățimea la container */
-    max-height: 500px;        /* înălțime fixă (ajustabilă) */
+    max-width: 80%;
+    max-height: 500px;
     display: block;
+}
+
+ body {
+     font-family: Arial, sans-serif;
+     padding: 20px;
+     background-color: #f5f5f5;
+ }
+h1 {
+    color: #333;
+}
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+button {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #45a049;
+}
+.section {
+    background-color: #fff;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 8px;
+}
+th {
+    background-color: #f2f2f2;
 }
