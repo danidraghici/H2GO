@@ -1,4 +1,33 @@
 
+let tratamentIndex = 0;
+
+function adaugaTratament() {
+    const container = document.getElementById("tratamenteList");
+
+    const medicamentDiv = document.createElement("div");
+    medicamentDiv.classList.add("tratament-item");
+    medicamentDiv.innerHTML = `
+        <input type="text" name="denumire_${tratamentIndex}" placeholder="Denumire medicament" required>
+
+        <select name="forma_${tratamentIndex}" required>
+            <option value="">Formă...</option>
+            <option value="comprimate">Comprimate</option>
+            <option value="capsule">Capsule</option>
+            <option value="sirop">Sirop</option>
+            <option value="injectabil">Injectabil</option>
+            <option value="unguent">Unguent</option>
+            <option value="spray">Spray</option>
+            <option value="supozitor">Supozitor</option>
+        </select>
+
+        <input type="text" name="posologie_${tratamentIndex}" placeholder="Ex: 1/8h sau 10ml la nevoie">
+
+        <button type="button" onclick="this.parentElement.remove()">🗑️</button>
+    `;
+    container.appendChild(medicamentDiv);
+    tratamentIndex++;
+}
+
     document.getElementById("consultatieForm").addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -11,9 +40,26 @@
         return;
     }
 
-    const consultatie = {
+        // 1. Construim lista de tratamente
+        const tratamentItems = document.querySelectorAll(".tratament-item");
+        let tratament = "";
+        for (const item of tratamentItems) {
+            const denumire = item.querySelector(`input[name^="denumire_"]`).value.trim();
+            const forma = item.querySelector(`select[name^="forma_"]`).value;
+            const posologie = item.querySelector(`input[name^="posologie_"]`).value.trim();
+
+            if (!denumire || !forma) {
+                alert("Completare lipsă într-un tratament!");
+                return;
+            }
+
+            tratament += `${denumire}; ${forma}; ${posologie}\n`;
+        }
+
+
+        const consultatie = {
     diagnostic: document.getElementById("diagnostic").value,
-    tratament: document.getElementById("retete").value + "\n" + document.getElementById("trimiteri").value,
+    tratament,
     recomandari: document.getElementById("recomandari").value,
     observatii: document.getElementById("motiv").value + "\n" +
         "Simptome: " + document.getElementById("simptome").value + "\n" +
