@@ -190,7 +190,7 @@ window.editPacient = async function (cnp) {
     document.getElementById('humidityVal').textContent = masuratori.umiditate || '-';
 
     // ECG (exemplu cu librărie Chart.js)
-    renderECG(masuratori.ecg || []);
+    renderECG(masuratori.ekg || []);
 
     // Consultatie
     const consultatie = await fetch(`http://localhost:3000/api/ultimaConsultatie/${cnp}`).then(res => res.json());
@@ -232,10 +232,13 @@ function renderECG(data) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false, // permite controlul prin CSS
             scales: {
-                y: {
-                    beginAtZero: false
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 20 // limitează cât de des sunt afișate valorile
+                    }
                 }
             }
         }

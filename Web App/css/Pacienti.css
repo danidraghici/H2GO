@@ -29,3 +29,10 @@ label {
     display: block;
     margin: 5px 0;
 }
+
+#ecgChart {
+    width: 100%;
+    max-width: 80%;     /* limitează lățimea la container */
+    max-height: 500px;        /* înălțime fixă (ajustabilă) */
+    display: block;
+}

@@ -262,22 +262,35 @@ app.get('/api/ultimaConsultatie/:cnp', async (req, res) => {
         const request = new sql.Request();
 
         const result = await request.query(`
-            SELECT TOP 1 *
-            FROM consultatii
-            WHERE cnp_pacient = '${cnp}'
-            ORDER BY data_consultatie DESC
+            SELECT TOP 1 
+                c.id_consultatie,
+                c.id_programare,
+                c.diagnostic,
+                c.tratament,
+                c.recomandari,
+                c.data_consultatie,
+                c.observatii,
+                p.cnp_doctor,
+                p.data_programare,
+                p.status,
+                p.comentarii
+            FROM consultatii c
+            INNER JOIN programari p ON c.id_programare = p.id
+            WHERE p.cnp_pacient = '${cnp}'
+            ORDER BY c.data_consultatie DESC
         `);
 
         if (result.recordset.length === 0) {
-            return res.status(200).json({ message: 'Nu exita inregistrari' });
+            return res.status(200).json({ message: 'Nu există înregistrări' });
         }
 
         res.json(result.recordset[0]);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Eroare la interogarea consultatiei');
+        res.status(500).send('Eroare la interogarea consultației');
     }
 });
+
 
 app.get('/api/ultimulTratament/:cnp', async (req, res) => {
     const { cnp } = req.params;
@@ -317,7 +330,7 @@ app.get('/api/praguri/:cnp', async (req, res) => {
 
     try {
         const result = await request.query(`
-                SELECT id, cnp_doctor,
+                SELECT id, cnp_medic,
                        limita_minima_puls, limita_maxima_puls,
                        limita_minima_temperatura, limita_maxima_temperatura,
                        limita_minima_umiditate, limita_maxima_umiditate,
@@ -329,7 +342,7 @@ app.get('/api/praguri/:cnp', async (req, res) => {
         if (result.recordset.length === 0) {
             return res.status(200).json([{
                 id: null,
-                cnp_doctor: null,
+                cnp_medic: null,
                 limita_minima_puls: 0,
                 limita_maxima_puls: 0,
                 limita_minima_temperatura: 0,
@@ -387,7 +400,7 @@ app.post('/api/update-praguri', async (req, res) => {
                 .input('detalii', sql.VarChar(100), `CNP: ${cnpPacient}`)
                 .query(`
                     INSERT INTO log_modificari
-                    (cnp_doctor, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare,
+                    (cnp_medic, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare,
                      operatie, detalii)
                     VALUES (@cnpMedic, @tabela, @coloana, @valoare_veche, @valoare_noua, @data, @operatie, @detalii)
                 `);
@@ -427,7 +440,7 @@ app.post('/api/update-praguri', async (req, res) => {
                 (cnp_pacient, limita_minima_puls, limita_maxima_puls,
                  limita_minima_temperatura, limita_maxima_temperatura,
                  limita_minima_ekg, limita_maxima_ekg,
-                 cnp_doctor, limita_minima_umiditate, limita_maxima_umiditate)
+                 cnp_medic, limita_minima_umiditate, limita_maxima_umiditate)
                 VALUES (@cnp_pacient, @minPuls, @maxPuls, 
                         @minTemp, @maxTemp, 
                         @minEKG, @maxEKG, 
@@ -464,7 +477,7 @@ app.post('/api/update-praguri', async (req, res) => {
                         .input('detalii', sql.VarChar(100), `CNP pacient: ${cnpPacient}`)
                         .query(`
                     INSERT INTO log_modificari 
-                    (cnp_doctor, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare, operatie, detalii)
+                    (cnp_medic, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare, operatie, detalii)
                     VALUES (@cnpMedic, @tabela, @coloana, @valoare_veche, @valoare_noua, @data, @operatie, @detalii)
                 `);
                 }
