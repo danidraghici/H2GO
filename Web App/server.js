@@ -227,24 +227,44 @@ app.get('/api/masuratori/:cnp', async (req, res) => {
             ORDER BY data_masurare DESC
         `);
 
+        // Obține ultima alertă pentru pacient
+        const alertaResult = await request.query(`
+            SELECT TOP 1
+                mesaj,
+                severitate,
+                status,
+                data_generare
+            FROM alerte
+            WHERE cnp_pacient = '${cnp}'
+            ORDER BY data_generare DESC, id DESC
+        `);
+
         if (result.recordset.length === 0) {
             masuratori = {
-                ekg: 0, // pentru grafic, ordonat crescător după timp
+                ekg: 0,
                 puls: parseFloat(0),
                 umiditate: parseFloat(0),
                 temperatura: parseFloat(0),
-                data_masurare: 0
+                data_masurare: 0,
+                alerta: null
             };
         }
     else {
             const latest = result.recordset[0];
+            const alerta = alertaResult.recordset[0];
 
             masuratori = {
                 ekg: ecgResult.recordset.map(r => parseFloat(r.masurare_ekg)).reverse(), // pentru grafic, ordonat crescător după timp
                 puls: parseFloat(latest.masurare_puls),
                 umiditate: parseFloat(latest.masurare_umiditate),
                 temperatura: parseFloat(latest.masurare_temperatura),
-                data_masurare: latest.data_masurare
+                data_masurare: latest.data_masurare,
+                alerta: alerta ? {
+                    mesaj: alerta.mesaj,
+                    severitate: alerta.severitate,
+                    status: alerta.status,
+                    data_generare: alerta.data_generare
+                } : null
             };
         }
         res.json(masuratori);
@@ -379,7 +399,6 @@ app.post('/api/update-praguri', async (req, res) => {
         `);
 
         if(oldResultStatus.recordset[0].Status_activ != status) {
-            console.log("aici")
             // 1. Actualizare status pacient
             const statusQuery = await transaction.request()
                 .input('status', sql.Bit, status)
@@ -400,7 +419,7 @@ app.post('/api/update-praguri', async (req, res) => {
                 .input('detalii', sql.VarChar(100), `CNP: ${cnpPacient}`)
                 .query(`
                     INSERT INTO log_modificari
-                    (cnp_medic, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare,
+                    (cnp_doctor, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare,
                      operatie, detalii)
                     VALUES (@cnpMedic, @tabela, @coloana, @valoare_veche, @valoare_noua, @data, @operatie, @detalii)
                 `);
@@ -477,7 +496,7 @@ app.post('/api/update-praguri', async (req, res) => {
                         .input('detalii', sql.VarChar(100), `CNP pacient: ${cnpPacient}`)
                         .query(`
                     INSERT INTO log_modificari 
-                    (cnp_medic, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare, operatie, detalii)
+                    (cnp_doctor, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare, operatie, detalii)
                     VALUES (@cnpMedic, @tabela, @coloana, @valoare_veche, @valoare_noua, @data, @operatie, @detalii)
                 `);
                 }
