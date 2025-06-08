@@ -5,6 +5,7 @@
     <title>Pacienții Mei</title>
     <link rel="stylesheet" href="./css/Pacienti.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <h1>Pacienții Mei
@@ -99,6 +100,7 @@
         <!-- Date monitorizate -->
         <div class="section">
             <h4>Date monitorizate de senzori</h4>
+            <button type="button" onclick="deschidePopupGrafic()">Istoric Masuratori</button>
             <p>Puls: <span id="pulseVal"></span> bpm</p>
             <p>Temperatură: <span id="tempVal"></span> °C</p>
             <p>Umiditate: <span id="humidityVal"></span> %</p>
@@ -109,7 +111,6 @@
         <div class="section">
             <h4>Ultima programare și consultație</h4>
             <p>Data: <span id="ultimaConsultatieData"></span></p>
-            <p>Tip: <span id="tipConsultatie"></span></p>
             <p>Diagnostic preliminar: <span id="diagnosticPreliminar"></span></p>
             <p>Observații: <span id="observatii"></span></p>
             <p>Recomandări: <span id="recomandari"></span></p>
@@ -125,6 +126,27 @@
             <p>Ultima prescriere: <span id="ultimaPrescriere"></span></p>
         </div>
     </form>
+    <div id="popupGrafic" class="modal-grafic" style="display: none">
+        <h3>Selectează perioada de afișare</h3>
+        <select id="perioadaSelect">
+            <option value="5z">5 zile</option>
+            <option value="7z">7 zile</option>
+            <option value="10z">10 zile</option>
+            <option value="1l">1 lună</option>
+            <option value="3l">3 luni</option>
+            <option value="5l">5 luni</option>
+            <option value="7l">7 luni</option>
+            <option value="9l">9 luni</option>
+            <option value="12l">12 luni</option>
+        </select>
+        <br><br>
+        <button onclick="genereazaGrafic()">Generează grafic</button>
+        <button onclick="descarcaExcel()">Descarcă Excel</button>
+        <button onclick="inchidePopupGrafic()">Închide</button>
+
+        <canvas id="graficDate"></canvas>
+    </div>
+
 </div>
 
 <script src="Pacienti.js"></script>

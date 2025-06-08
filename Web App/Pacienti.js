@@ -4,6 +4,88 @@ let allPacienti = [];
 let currentPage = 1;
 const pageSize = 8;
 
+let graficChart;
+
+function deschidePopupGrafic() {
+    document.getElementById('popupGrafic').style.display = 'block';
+}
+
+function inchidePopupGrafic() {
+    document.getElementById('popupGrafic').style.display = 'none';
+}
+
+async function genereazaGrafic() {
+    const perioada = document.getElementById('perioadaSelect').value;
+    const cnp = document.getElementById('editCNP').value;
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/date-monitorizare?cnp=${cnp}&perioada=${perioada}`);
+        const data = await response.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+            alert('Nu există date pentru perioada selectată.');
+            return;
+        }
+
+        const labels = data.map(d =>
+            new Date(d.data_masurare).toLocaleString('ro-RO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+        );
+
+        const puls = data.map(d => d.masurare_puls);
+        const temperatura = data.map(d => d.masurare_temperatura);
+        const umiditate = data.map(d => d.masurare_umiditate);
+
+        if (graficChart) graficChart.destroy();
+
+        const ctx = document.getElementById('graficDate').getContext('2d');
+        graficChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    { label: 'Puls (bpm)', data: puls, borderColor: 'blue', fill: false },
+                    { label: 'Temperatură (°C)', data: temperatura, borderColor: 'red', fill: false },
+                    { label: 'Umiditate (%)', data: umiditate, borderColor: 'green', fill: false }
+                ]
+            }
+        });
+
+        graficChart.customData = { labels, puls, temperatura, umiditate };
+    } catch (err) {
+        console.error('Eroare fetch:', err);
+        alert('Eroare la încărcarea datelor monitorizate.');
+    }
+}
+
+
+function descarcaExcel() {
+    if (!graficChart || !graficChart.customData) {
+        alert("Generează graficul mai întâi!");
+        return;
+    }
+
+    const { labels, puls, temperatura, umiditate } = graficChart.customData;
+
+    const rows = [["Zi", "Puls (bpm)", "Temperatură (°C)", "Umiditate (%)"]];
+    for (let i = 0; i < labels.length; i++) {
+        rows.push([labels[i], puls[i], temperatura[i], umiditate[i]]);
+    }
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, "Monitorizare");
+
+    XLSX.writeFile(wb, "GraficDateMonitorizare.xlsx");
+}
+
+
+
 let ecgChartInstance = null;
 
 document.querySelector('button[type="submit"]').addEventListener('click', async () => {
@@ -195,8 +277,7 @@ window.editPacient = async function (cnp) {
     // Consultatie
     const consultatie = await fetch(`http://localhost:3000/api/ultimaConsultatie/${cnp}`).then(res => res.json());
     document.getElementById('ultimaConsultatieData').textContent = consultatie.data_consultatie || '-';
-    document.getElementById('tipConsultatie').textContent = consultatie.tip_consultatie || '-';
-    document.getElementById('diagnosticPreliminar').textContent = consultatie.diagnostic_preliminar || '-';
+    document.getElementById('diagnosticPreliminar').textContent = consultatie.diagnostic || '-';
     document.getElementById('observatii').textContent = consultatie.observatii || '-';
     document.getElementById('recomandari').textContent = consultatie.recomandari || '-';
 

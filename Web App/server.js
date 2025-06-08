@@ -564,6 +564,72 @@ app.post('/api/consultatii', async (req, res) => {
                 VALUES (@id_programare, @diagnostic, @tratament, @recomandari, @data_consultatie, @observatii)
             `);
 
+        // 3. Mutăm tratamentele vechi în istoric
+        const tratamenteVeche = await pool.request()
+            .input('cnp_pacient', sql.Char(13), cnp_pacient)
+            .query(`
+        SELECT * FROM medicatie_curenta WHERE cnp_pacient = @cnp_pacient
+    `);
+
+        for (const t of tratamenteVeche.recordset) {
+            await pool.request()
+                .input('cnp_doctor', sql.Char(13), t.cnp_doctor)
+                .input('cnp_pacient', sql.Char(13), t.cnp_pacient)
+                .input('denumire_medicament', sql.VarChar(100), t.denumire_medicament)
+                .input('forma_farmaceutica', sql.VarChar(100), t.forma_farmaceutica)
+                .input('posologie', sql.VarChar(50), t.posologie)
+                .input('data_incepere', sql.Date, t.data_incepere)
+                .input('data_finalizare', sql.Date, new Date())
+                .input('motiv_intrerupere', sql.Text, 'Finalizare consultație')
+                .query(`
+            INSERT INTO istoric_medicatie (
+                cnp_doctor, cnp_pacient, denumire_medicament,
+                forma_farmaceutica, posologie, data_incepere,
+                data_finalizare, motiv_intrerupere
+            )
+            VALUES (
+                @cnp_doctor, @cnp_pacient, @denumire_medicament,
+                @forma_farmaceutica, @posologie, @data_incepere,
+                @data_finalizare, @motiv_intrerupere
+            )
+        `);
+        }
+
+        // 4. Ștergem din medicatie_curenta
+        await pool.request()
+            .input('cnp_pacient', sql.Char(13), cnp_pacient)
+            .query(`DELETE FROM medicatie_curenta WHERE cnp_pacient = @cnp_pacient`);
+
+        const tratamenteNoi = tratament
+            .split('\n')
+            .map(l => l.trim())
+            .filter(l => l.length > 0);
+
+        for (const linie of tratamenteNoi) {
+            const [denumire, forma, posologie] = linie.split(';').map(s => s.trim());
+            if (!denumire || !forma) continue;
+
+            await pool.request()
+                .input('cnp_doctor', sql.Char(13), cnp_doctor)
+                .input('cnp_pacient', sql.Char(13), cnp_pacient)
+                .input('denumire_medicament', sql.VarChar(100), denumire)
+                .input('forma_farmaceutica', sql.VarChar(100), forma)
+                .input('posologie', sql.Text, posologie || '')
+                .input('data_incepere', sql.Date, new Date())
+                .input('data_ultima_prescriere', sql.Date, new Date())
+                .query(`
+            INSERT INTO medicatie_curenta (
+                cnp_doctor, cnp_pacient, denumire_medicament,
+                forma_farmaceutica, posologie, data_incepere, data_ultima_prescriere
+            )
+            VALUES (
+                @cnp_doctor, @cnp_pacient, @denumire_medicament,
+                @forma_farmaceutica, @posologie, @data_incepere, @data_ultima_prescriere
+            )
+        `);
+        }
+
+
         res.status(201).json({ message: 'Consultația a fost salvată.' });
     } catch (err) {
         console.error("Eroare salvare:", err);
@@ -571,5 +637,41 @@ app.post('/api/consultatii', async (req, res) => {
     }
 });
 
+app.get('/api/date-monitorizare', async (req, res) => {
+    const { cnp, perioada } = req.query;
+
+    if (!cnp || !perioada) {
+        return res.status(400).json({ error: 'Parametrii lipsă: cnp sau perioada' });
+    }
+
+    let nrZile = 7;
+    if (perioada.endsWith('z')) {
+        nrZile = parseInt(perioada);
+    } else if (perioada.endsWith('l')) {
+        nrZile = parseInt(perioada) * 30;
+    }
+
+    try {
+        const pool = await sql.connect(config);
+        const result = await pool.request()
+            .input('cnp', sql.VarChar, cnp)
+            .input('dataLimita', sql.DateTime, new Date(Date.now() - nrZile * 24 * 60 * 60 * 1000))
+            .query(`
+                SELECT
+                masurare_puls,
+                masurare_umiditate,
+                masurare_temperatura,
+                data_masurare
+                FROM masuratori
+                WHERE cnp_pacient = @cnp AND data_masurare >= @dataLimita
+                ORDER BY data_masurare ASC
+            `);
+
+        res.json(result.recordset);
+    } catch (err) {
+        console.error('Eroare DB:', err);
+        res.status(500).json({ error: 'Eroare server sau conexiune SQL' });
+    }
+});
 
 app.listen(3000, () => console.log('API server running on port 3000'));
