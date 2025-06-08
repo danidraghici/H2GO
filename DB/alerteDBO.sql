@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[alerte]    Script Date: 23.05.2025 18:33:20 ******/
+/****** Object:  Table [dbo].[alerte]    Script Date: 08.06.2025 18:28:55 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -20,17 +20,17 @@ CREATE TABLE [dbo].[alerte](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[alerte]  WITH CHECK ADD  CONSTRAINT [FK_CNP_ALERTA] FOREIGN KEY([cnp_pacient])
-REFERENCES [dbo].[pacienti] ([CNP])
-GO
-
-ALTER TABLE [dbo].[alerte] CHECK CONSTRAINT [FK_CNP_ALERTA]
-GO
-
-ALTER TABLE [dbo].[alerte]  WITH CHECK ADD  CONSTRAINT [FK_ID_MASURARE] FOREIGN KEY([masurare_id])
+ALTER TABLE [dbo].[alerte]  WITH CHECK ADD  CONSTRAINT [FK_alerte_masuratori] FOREIGN KEY([masurare_id])
 REFERENCES [dbo].[masuratori] ([id])
 GO
 
-ALTER TABLE [dbo].[alerte] CHECK CONSTRAINT [FK_ID_MASURARE]
+ALTER TABLE [dbo].[alerte] CHECK CONSTRAINT [FK_alerte_masuratori]
+GO
+
+ALTER TABLE [dbo].[alerte]  WITH CHECK ADD  CONSTRAINT [FK_alerte_pacienti] FOREIGN KEY([cnp_pacient])
+REFERENCES [dbo].[pacienti] ([CNP])
+GO
+
+ALTER TABLE [dbo].[alerte] CHECK CONSTRAINT [FK_alerte_pacienti]
 GO
 
