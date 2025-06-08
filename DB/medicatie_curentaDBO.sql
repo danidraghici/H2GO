@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[medicatie_curenta]    Script Date: 07.06.2025 22:50:00 ******/
+/****** Object:  Table [dbo].[medicatie_curenta]    Script Date: 08.06.2025 18:31:58 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -26,5 +26,12 @@ REFERENCES [dbo].[utilizatori] ([CNP])
 GO
 
 ALTER TABLE [dbo].[medicatie_curenta] CHECK CONSTRAINT [FK_CNP_DOCTOR_MEDICATIE]
+GO
+
+ALTER TABLE [dbo].[medicatie_curenta]  WITH CHECK ADD  CONSTRAINT [FK_medicatie_curenta_pacienti] FOREIGN KEY([cnp_pacient])
+REFERENCES [dbo].[pacienti] ([CNP])
+GO
+
+ALTER TABLE [dbo].[medicatie_curenta] CHECK CONSTRAINT [FK_medicatie_curenta_pacienti]
 GO
 

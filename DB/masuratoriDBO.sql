@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[masuratori]    Script Date: 07.06.2025 16:35:03 ******/
+/****** Object:  Table [dbo].[masuratori]    Script Date: 08.06.2025 18:31:39 ******/
 SET ANSI_NULLS ON
 GO
 

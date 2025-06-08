@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[dosar_medical]    Script Date: 21.05.2025 18:11:43 ******/
+/****** Object:  Table [dbo].[dosar_medical]    Script Date: 08.06.2025 18:30:10 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -21,11 +21,11 @@ CREATE TABLE [dbo].[dosar_medical](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[dosar_medical]  WITH CHECK ADD  CONSTRAINT [FK_CNP] FOREIGN KEY([cnp_pacient])
+ALTER TABLE [dbo].[dosar_medical]  WITH CHECK ADD  CONSTRAINT [FK_dosar_medical_pacienti] FOREIGN KEY([cnp_pacient])
 REFERENCES [dbo].[pacienti] ([CNP])
 GO
 
-ALTER TABLE [dbo].[dosar_medical] CHECK CONSTRAINT [FK_CNP]
+ALTER TABLE [dbo].[dosar_medical] CHECK CONSTRAINT [FK_dosar_medical_pacienti]
 GO
 
 ALTER TABLE [dbo].[dosar_medical]  WITH CHECK ADD  CONSTRAINT [FK_Medic] FOREIGN KEY([id_medic])
