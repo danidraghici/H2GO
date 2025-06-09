@@ -1,79 +1,131 @@
-body {
+* {
   margin: 0;
-  font-family: 'Adamina', serif;
-  background-color: #f9f9f9;
-  color: #333;
-  height: 100vh;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+  background-color: white;
+}
+
+.medic-wrapper {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
+.medic-header {
+  background-color: #b2cdb5;
   padding: 20px 40px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
-.logo {
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-img {
+  width: 45px;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-text {
+  color: #3d5a40;
   font-size: 28px;
-  font-weight: bold;
-  color: #4CAF50;
+  font-weight: 700;
 }
 
-.logout-btn button {
-  background-color: #4CAF50;
+.logout-header-btn {
+  background-color: #8b0000;
   color: white;
   border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.logout-btn button:hover {
-  background-color: #45a049;
+.logout-header-btn:hover {
+  background-color: #944545;
 }
 
-main {
+.medic-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 40px;
   text-align: center;
 }
 
 .welcome-text {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 30px;
+  font-size: 36px;
+  color: #3d5a40;
+  margin-bottom: 40px;
+  font-weight: 600;
 }
 
-.pacienti-button {
-  position: fixed;
-  bottom: 60px;
-  left: 30px;
-  background-color: #4CAF50;
+.medic-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.medic-btn {
+  padding: 16px;
+  background-color: #619f6d;
   color: white;
-  padding: 14px 24px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
   text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-.pacienti-button:hover {
-  background-color: #45a049;
-}
-
-footer {
   text-align: center;
-  padding: 15px;
+  border: none;
+  border-radius: 37px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.medic-btn:hover {
+  background-color: #5a665c;
+}
+
+.medic-footer {
+  text-align: center;
+  padding: 20px;
   font-size: 14px;
-  background-color: #fff;
-  border-top: 1px solid #ddd;
+  color: #3d5a40;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .medic-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .logout-header-btn {
+    align-self: flex-end;
+  }
+
+  .welcome-text {
+    font-size: 28px;
+  }
+
+  .medic-btn {
+    font-size: 15px;
+    padding: 14px;
+  }
 }
