@@ -1,93 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
   <head>
     <meta charset="utf-8" />
-
-    <title>HeartBit</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Adamina&display=swap"
-      rel="stylesheet"
-    />
-    <script type="module" src="ContMedic.js"></script>
+    <title>HeartBit - Cont Medic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./css/ContMedic.css" />
+    <script type="module" src="ContMedic.js"></script>
   </head>
+  <body class="body-bg">
+    <div class="container">
+      <form id="signup-medic" class="form-box">
+        <h2>Introduceți datele medicului</h2>
 
-  <body style="background-color: #eee9e7">
-    <div class="e10_86">
-      <form id="signup-medic">
-        <div class="e10_109"></div>
-        <div class="e10_108">
-          <div class="e59_155">
-            <div class="e10_910">
-              <div class="e10_911">
-                <input type="text" class="ei10_911_4_17" name="cnp" id="cnp" />
-              </div>
-              <span class="e10_912">CNP</span>
-            </div>
+        <label for="cnp">CNP</label>
+        <input type="text" id="cnp" name="cnp" required />
 
-            <div class="e10_110">
-              <div class="e10_111">
-                <input
-                  type="email"
-                  class="ei10_111_4_17"
-                  name="email"
-                  id="email"
-                />
-              </div>
-              <span class="e10_112">Email</span>
-            </div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
 
-            <div class="e10_113">
-              <div class="e10_114">
-                <input
-                  type="text"
-                  class="ei10_114_4_17"
-                  name="nume"
-                  id="nume"
-                />
-              </div>
-              <span class="e10_115">Nume</span>
-            </div>
+        <label for="nume">Nume</label>
+        <input type="text" id="nume" name="nume" required />
 
-            <div class="e10_116">
-              <div class="e10_117">
-                <input
-                  type="text"
-                  class="ei10_117_4_17"
-                  name="prenume"
-                  id="prenume"
-                />
-              </div>
-              <span class="e10_118">Prenume</span>
-            </div>
+        <label for="prenume">Prenume</label>
+        <input type="text" id="prenume" name="prenume" required />
 
-            <div class="e10_916">
-              <div class="e10_917">
-                <input
-                  type="password"
-                  class="ei10_917_4_17"
-                  name="password"
-                  id="password"
-                />
-              </div>
-              <span class="e10_918">Parola</span>
-            </div>
+        <label for="password">Parola</label>
+        <input type="password" id="password" name="password" required />
 
-            <div class="e10_119">
-              <button type="submit" class="e10_120" id="e10_121">
-                Creare Cont
-              </button>
-            </div>
-            <span class="e10_133">Introduceți datele medicului</span>
-
-            <div class="e10_219">
-              <a href="index.html" class="e10_220">
-                <div class="e10_221">Anulare</div>
-              </a>
-            </div>
-          </div>
+        <div class="button-group">
+          <button type="submit" class="btn submit">Creare Cont</button>
+          <a href="index.html" class="btn cancel">Anulare</a>
         </div>
       </form>
     </div>
   </body>
 </html>
+
