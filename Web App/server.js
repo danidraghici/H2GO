@@ -693,4 +693,29 @@ app.get('/api/date-monitorizare', async (req, res) => {
     }
 });
 
+
+const { sharePatientToFhir } = require('./utils/fhirService');
+
+app.post('/api/pacienti/:id/share-fhir', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await sql.connect(config);
+        const result = await sql.query`SELECT * FROM Pacienti WHERE CNP = ${id}`;
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Pacientul nu a fost găsit' });
+        }
+
+        const pacient = result.recordset[0];
+
+        const rezultatFhir = await sharePatientToFhir(pacient);
+
+        res.json({ success: true, message: 'Pacient partajat cu succes în FHIR.', rezultatFhir });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Eroare la partajare FHIR.' });
+    }
+});
+
 app.listen(3000, () => console.log('API server running on port 3000'));
