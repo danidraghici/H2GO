@@ -392,4 +392,17 @@ function  adaugaConsultatie() {
     window.location.href = `AdaugaConsultatie.html?cnp=${pacient}`;
 }
 
+async function partajeazaFHIR() {
+    const pacientId = document.getElementById('editCNP').value;
+    const response = await fetch(`http://localhost:3000/api/pacienti/${pacientId}/share-fhir`, {
+        method: 'POST'
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        alert("Partajare reușită: " + data.message);
+    } else {
+        alert("Eroare la partajare: " + data.message);
+    }
+}
 loadPacienti();
