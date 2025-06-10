@@ -2,52 +2,38 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <link href="https://fonts.googleapis.com/css?family=Adamina&display=swap" rel="stylesheet" />
-        <link href="./css/WelcomePacient.css" rel="stylesheet" />
-        <title>HeartBit</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/WelcomePacient.css" />
+        <title>H2Go - Pacient</title>
     </head>
-    <body>
-        <div class="v5_46974">
-            <div class="v5_47016">
-                <div class="v5_47006"></div>
-                <span class="v5_47015">© 2023 HeartBit. All rights reserved.</span>
-                <div class="v50_177">
-                    <span class="v5_47017">HeartBit</span>
-                    <div class="v5_47018"></div>
-                </div>
-            </div>
-            <div class="v48_166">
-                <div class="v5_47019"></div>
-                <span class="v5_47020">Welcome, Pacient.</span>
-            </div>
-            <div class="v5_47023">
-                <div class="v5_47022">
-                    <a href="IesireCont.html">
-                        <div class="v5_47025">
-                            <div class="v5_47026"></div>
-                            <span class="v5_47027">Ieșire din cont</span>
-                        </div>
-                    </a>
-                    <a href="FisaMedicala.html">
-                        <div class="v5_47028">
-                            <div class="v5_47029"></div>
-                            <span class="v5_47030">Fișa medicală</span>
-                        </div>
-                    </a>
-                    <a href="Recomandari.html">
-                        <div class="v5_47031">
-                            <div class="v5_47032"></div>
-                            <span class="v5_47033">Recomandări</span>
-                        </div>
-                    </a>
-                    <a href="Istoric.html">
-                        <div class="v5_47034">
-                            <div class="v5_47035"></div>
-                            <span class="v5_47036">Istoric</span>
-                        </div>
-                    </a>   
-                </div>
-            </div>
-        </div>
-    </body>
+   <body>
+  <div class="pacient-wrapper">
+    <header class="pacient-header">
+      <div class="logo-box">
+        <img src="images/heartbitlogo_1.png" alt="Logo" class="logo-img" />
+        <span class="logo-text">H2Go</span>
+      </div>
+      <button class="logout-header-btn" onclick="logout()">Ieșire din cont</button>
+    </header>
+
+    <main class="pacient-main">
+      <h1 class="welcome-text">Bine ai revenit, Pacient!</h1>
+      <div class="pacient-buttons">
+        <a href="FisaMedicala.html" class="pacient-btn">Fișa medicală</a>
+        <a href="Recomandari.html" class="pacient-btn">Recomandări</a>
+        <a href="Istoric.html" class="pacient-btn">Istoric</a>
+      </div>
+    </main>
+
+    <footer class="pacient-footer">
+      <p>© 2025 H2Go. Toate drepturile rezervate.</p>
+    </footer>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = "index.html"; 
+    }
+  </script>
+</body>
 </html>

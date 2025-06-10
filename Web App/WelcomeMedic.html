@@ -3,31 +3,38 @@
 
 <head>
     <meta charset="utf-8">
-    <link href="https://fonts.googleapis.com/css?family=Adamina&display=swap" rel="stylesheet" />
-    <link href="./css/WelcomeMedic.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/WelcomeMedic.css" />
     <script type="module" src="WelcomeMedic.js"></script>
-    <title>HeartBit</title>
+    <title>H2Go - Medic</title>
 </head>
 <body>
-<header>
-    <div class="logo">H2Go</div>
-    <div class="logout-btn">
-        <form id="logout">
-            <button type="submit">Ieșire din cont</button>
-        </form>
-    </div>
-</header>
+  <div class="medic-wrapper">
+    <header class="medic-header">
+      <div class="logo-box">
+        <img src="images/heartbitlogo_1.png" alt="Logo" class="logo-img" />
+        <span class="logo-text">H2Go</span>
+      </div>
+      <button class="logout-header-btn" onclick="logout()">Ieșire din cont</button>
+    </header>
 
-<main>
-    <div class="welcome-text">Bine ai revenit, Medic!</div>
-    <a href="Pacienti.html" class="pacienti-button">Pacienți</a>
-</main>
+    <main class="medic-main">
+      <h1 class="welcome-text">Bine ai revenit, Medic!</h1>
+      <div class="medic-buttons">
+        <a href="Pacienti.html" class="medic-btn">Pacienții mei</a>
+      </div>
+    </main>
 
+    <footer class="medic-footer">
+      <p>© 2025 H2Go. Toate drepturile rezervate.</p>
+    </footer>
+  </div>
 
-
-<footer>
-    © 2025 H2Go. Toate drepturile rezervate.
-</footer>
+  <script>
+    function logout() {
+      window.location.href = "index.html"; 
+    }
+  </script>
 </body>
 
 </html>
