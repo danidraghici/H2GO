@@ -36,7 +36,7 @@ app.post('/api/login', async (req, res) => {
         }
 
         const user = result.recordset[0];
-        
+
         const passwordMatch = await bcrypt.compare(password, user.parola_hash);
 
         if (!passwordMatch) {
@@ -703,14 +703,29 @@ app.post('/api/pacienti/:id/share-fhir', async (req, res) => {
 
     try {
         await sql.connect(config);
-        const result = await sql.query`SELECT * FROM Pacienti WHERE CNP = ${id}`;
 
-        if (result.recordset.length === 0) {
+        // Pacient
+        const resultPacient = await sql.query`SELECT * FROM pacienti WHERE CNP = ${id}`;
+        if (resultPacient.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'Pacientul nu a fost găsit' });
         }
+        const pacient = resultPacient.recordset[0];
 
-        const pacient = result.recordset[0];
+        // Medicație curentă
+        const resultMedCurenta = await sql.query`
+      SELECT * FROM medicatie_curenta WHERE cnp_pacient = ${id}
+    `;
 
+        // Istoric medicație
+        const resultIstoricMed = await sql.query`
+      SELECT * FROM istoric_medicatie WHERE cnp_pacient = ${id}
+    `;
+
+        // Adaugă datele medicației pacientului în obiectul pacient
+        pacient.medicationCurrent = resultMedCurenta.recordset;
+        pacient.medicationHistory = resultIstoricMed.recordset;
+
+        // Apelează funcția care construiește resursa FHIR cu toate datele
         const rezultatFhir = await sharePatientToFhir(pacient);
 
         res.json({ success: true, message: 'Pacient partajat cu succes în FHIR.', rezultatFhir });
@@ -771,7 +786,7 @@ const temperatura = masurare_temperatura;
 
     const timestamp = new Date().toISOString();
     function generateRandomId() {
-  return Math.floor(100000 + Math.random() * 900000); 
+  return Math.floor(100000 + Math.random() * 900000);
 
 }
 
@@ -897,7 +912,7 @@ app.post('/api/login/mobile', async (req, res) => {
           WHERE cnp = ${user.CNP}
         `;
         console.log(`CNP pacient: ${user.cnp}`);
-        console.log(`Pacient data: ${JSON.stringify(pacientData.recordset)}`);  
+        console.log(`Pacient data: ${JSON.stringify(pacientData.recordset)}`);
         if (pacientData.recordset.length > 0) {
           additionalData = pacientData.recordset[0];
         }
@@ -974,7 +989,7 @@ app.post('/api/alertaNoua', async (req, res) => {
     data_generare
   } = req.body;
 
-  
+
    function generateRandomId() {
   return Math.floor(100000 + Math.random() * 900000); }// 6 cifre random
   let id1 = generateRandomId();
@@ -997,7 +1012,7 @@ app.post('/api/alertaNoua', async (req, res) => {
       '${data_generare}'
       )
     `);
-    
+
         console.log(result);
         res.status(200).json({ success: true, praguri: result.recordset[0] });
     } catch (err) {
@@ -1006,7 +1021,7 @@ app.post('/api/alertaNoua', async (req, res) => {
     }
 });
 
-// Get appointments 
+// Get appointments
 app.get('/api/programariPerPacient/:cnp', async (req, res) => {
   const { cnp } = req.params;
   try {
@@ -1029,7 +1044,7 @@ app.get('/api/programariPerPacient/:cnp', async (req, res) => {
   }
 });
 
-// Get consultatie 
+// Get consultatie
 app.get('/api/programari/:id/consultatie', async (req, res) => {
   const { id } = req.params;
   try {
@@ -1126,5 +1141,3 @@ console.log('ALERTE', result);
 });
 
 app.listen(3000, () => console.log('API server running on port 3000'));
-
-
