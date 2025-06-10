@@ -701,14 +701,29 @@ app.post('/api/pacienti/:id/share-fhir', async (req, res) => {
 
     try {
         await sql.connect(config);
-        const result = await sql.query`SELECT * FROM Pacienti WHERE CNP = ${id}`;
 
-        if (result.recordset.length === 0) {
+        // Pacient
+        const resultPacient = await sql.query`SELECT * FROM pacienti WHERE CNP = ${id}`;
+        if (resultPacient.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'Pacientul nu a fost găsit' });
         }
+        const pacient = resultPacient.recordset[0];
 
-        const pacient = result.recordset[0];
+        // Medicație curentă
+        const resultMedCurenta = await sql.query`
+      SELECT * FROM medicatie_curenta WHERE cnp_pacient = ${id}
+    `;
 
+        // Istoric medicație
+        const resultIstoricMed = await sql.query`
+      SELECT * FROM istoric_medicatie WHERE cnp_pacient = ${id}
+    `;
+
+        // Adaugă datele medicației pacientului în obiectul pacient
+        pacient.medicationCurrent = resultMedCurenta.recordset;
+        pacient.medicationHistory = resultIstoricMed.recordset;
+
+        // Apelează funcția care construiește resursa FHIR cu toate datele
         const rezultatFhir = await sharePatientToFhir(pacient);
 
         res.json({ success: true, message: 'Pacient partajat cu succes în FHIR.', rezultatFhir });
@@ -717,5 +732,6 @@ app.post('/api/pacienti/:id/share-fhir', async (req, res) => {
         res.status(500).json({ success: false, message: 'Eroare la partajare FHIR.' });
     }
 });
+
 
 app.listen(3000, () => console.log('API server running on port 3000'));
