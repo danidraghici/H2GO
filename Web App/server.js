@@ -201,6 +201,7 @@ app.put('/api/pacienti/:cnp', async (req, res) => {
     }
 });
 
+const axios = require('axios');
 app.get('/api/masuratori/:cnp', async (req, res) => {
     const { cnp } = req.params;
     let masuratori;
@@ -240,6 +241,7 @@ app.get('/api/masuratori/:cnp', async (req, res) => {
             ORDER BY data_generare DESC, id DESC
         `);
 
+
         if (result.recordset.length === 0) {
             masuratori = {
                 ekg: 0,
@@ -247,13 +249,20 @@ app.get('/api/masuratori/:cnp', async (req, res) => {
                 umiditate: parseFloat(0),
                 temperatura: parseFloat(0),
                 data_masurare: 0,
-                alerta: null
+                alerta: null,
+                clasificare: 0
             };
         }
     else {
             const latest = result.recordset[0];
             const alerta = alertaResult.recordset[0];
 
+            const response = await axios.post('http://localhost:5000/clasifica', {
+                puls: parseFloat(latest.masurare_puls),
+                temperatura: parseFloat(latest.masurare_temperatura),
+                umiditate: parseFloat(latest.masurare_umiditate)
+            });
+            console.log(response)
             masuratori = {
                 ekg: ecgResult.recordset.map(r => parseFloat(r.masurare_ekg)).reverse(), // pentru grafic, ordonat crescător după timp
                 puls: parseFloat(latest.masurare_puls),
@@ -265,7 +274,8 @@ app.get('/api/masuratori/:cnp', async (req, res) => {
                     severitate: alerta.severitate,
                     status: alerta.status,
                     data_generare: alerta.data_generare
-                } : null
+                } : null,
+                clasificare: response.data.clasificare
             };
         }
         console.log(`Masuratori pentru CNP ${cnp}:`, masuratori);

@@ -274,6 +274,7 @@ window.editPacient = async function (cnp) {
         });
     // Masuratori
     const masuratori = await fetch(`http://localhost:3000/api/masuratori/${cnp}`).then(res => res.json());
+    document.getElementById('clasificareBoala').textContent = masuratori.clasificare || '-';
     document.getElementById('pulseVal').textContent = masuratori.puls || '-';
     document.getElementById('tempVal').textContent = masuratori.temperatura || '-';
     document.getElementById('humidityVal').textContent = masuratori.umiditate || '-';
