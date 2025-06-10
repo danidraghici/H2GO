@@ -228,24 +228,44 @@ app.get('/api/masuratori/:cnp', async (req, res) => {
             ORDER BY data_masurare DESC
         `);
 
+        // Obține ultima alertă pentru pacient
+        const alertaResult = await request.query(`
+            SELECT TOP 1
+                mesaj,
+                severitate,
+                status,
+                data_generare
+            FROM alerte
+            WHERE cnp_pacient = '${cnp}'
+            ORDER BY data_generare DESC, id DESC
+        `);
+
         if (result.recordset.length === 0) {
             masuratori = {
-                ekg: 0, // pentru grafic, ordonat crescător după timp
+                ekg: 0,
                 puls: parseFloat(0),
                 umiditate: parseFloat(0),
                 temperatura: parseFloat(0),
-                data_masurare: 0
+                data_masurare: 0,
+                alerta: null
             };
         }
     else {
             const latest = result.recordset[0];
+            const alerta = alertaResult.recordset[0];
 
             masuratori = {
                 ekg: ecgResult.recordset.map(r => parseFloat(r.masurare_ekg)).reverse(), // pentru grafic, ordonat crescător după timp
                 puls: parseFloat(latest.masurare_puls),
                 umiditate: parseFloat(latest.masurare_umiditate),
                 temperatura: parseFloat(latest.masurare_temperatura),
-                data_masurare: latest.data_masurare
+                data_masurare: latest.data_masurare,
+                alerta: alerta ? {
+                    mesaj: alerta.mesaj,
+                    severitate: alerta.severitate,
+                    status: alerta.status,
+                    data_generare: alerta.data_generare
+                } : null
             };
         }
         console.log(`Masuratori pentru CNP ${cnp}:`, masuratori);
@@ -381,7 +401,6 @@ app.post('/api/update-praguri', async (req, res) => {
         `);
 
         if(oldResultStatus.recordset[0].Status_activ != status) {
-            console.log("aici")
             // 1. Actualizare status pacient
             const statusQuery = await transaction.request()
                 .input('status', sql.Bit, status)
@@ -402,7 +421,7 @@ app.post('/api/update-praguri', async (req, res) => {
                 .input('detalii', sql.VarChar(100), `CNP: ${cnpPacient}`)
                 .query(`
                     INSERT INTO log_modificari
-                    (cnp_medic, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare,
+                    (cnp_doctor, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare,
                      operatie, detalii)
                     VALUES (@cnpMedic, @tabela, @coloana, @valoare_veche, @valoare_noua, @data, @operatie, @detalii)
                 `);
@@ -479,7 +498,7 @@ app.post('/api/update-praguri', async (req, res) => {
                         .input('detalii', sql.VarChar(100), `CNP pacient: ${cnpPacient}`)
                         .query(`
                     INSERT INTO log_modificari 
-                    (cnp_medic, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare, operatie, detalii)
+                    (cnp_doctor, tabela_modificata, coloana_modificata, valoare_veche, valoare_noua, data_modificare, operatie, detalii)
                     VALUES (@cnpMedic, @tabela, @coloana, @valoare_veche, @valoare_noua, @data, @operatie, @detalii)
                 `);
                 }
@@ -566,12 +585,141 @@ app.post('/api/consultatii', async (req, res) => {
                 VALUES (@id_programare, @diagnostic, @tratament, @recomandari, @data_consultatie, @observatii)
             `);
 
+        // 3. Mutăm tratamentele vechi în istoric
+        const tratamenteVeche = await pool.request()
+            .input('cnp_pacient', sql.Char(13), cnp_pacient)
+            .query(`
+        SELECT * FROM medicatie_curenta WHERE cnp_pacient = @cnp_pacient
+    `);
+
+        for (const t of tratamenteVeche.recordset) {
+            await pool.request()
+                .input('cnp_doctor', sql.Char(13), t.cnp_doctor)
+                .input('cnp_pacient', sql.Char(13), t.cnp_pacient)
+                .input('denumire_medicament', sql.VarChar(100), t.denumire_medicament)
+                .input('forma_farmaceutica', sql.VarChar(100), t.forma_farmaceutica)
+                .input('posologie', sql.VarChar(50), t.posologie)
+                .input('data_incepere', sql.Date, t.data_incepere)
+                .input('data_finalizare', sql.Date, new Date())
+                .input('motiv_intrerupere', sql.Text, 'Finalizare consultație')
+                .query(`
+            INSERT INTO istoric_medicatie (
+                cnp_doctor, cnp_pacient, denumire_medicament,
+                forma_farmaceutica, posologie, data_incepere,
+                data_finalizare, motiv_intrerupere
+            )
+            VALUES (
+                @cnp_doctor, @cnp_pacient, @denumire_medicament,
+                @forma_farmaceutica, @posologie, @data_incepere,
+                @data_finalizare, @motiv_intrerupere
+            )
+        `);
+        }
+
+        // 4. Ștergem din medicatie_curenta
+        await pool.request()
+            .input('cnp_pacient', sql.Char(13), cnp_pacient)
+            .query(`DELETE FROM medicatie_curenta WHERE cnp_pacient = @cnp_pacient`);
+
+        const tratamenteNoi = tratament
+            .split('\n')
+            .map(l => l.trim())
+            .filter(l => l.length > 0);
+
+        for (const linie of tratamenteNoi) {
+            const [denumire, forma, posologie] = linie.split(';').map(s => s.trim());
+            if (!denumire || !forma) continue;
+
+            await pool.request()
+                .input('cnp_doctor', sql.Char(13), cnp_doctor)
+                .input('cnp_pacient', sql.Char(13), cnp_pacient)
+                .input('denumire_medicament', sql.VarChar(100), denumire)
+                .input('forma_farmaceutica', sql.VarChar(100), forma)
+                .input('posologie', sql.Text, posologie || '')
+                .input('data_incepere', sql.Date, new Date())
+                .input('data_ultima_prescriere', sql.Date, new Date())
+                .query(`
+            INSERT INTO medicatie_curenta (
+                cnp_doctor, cnp_pacient, denumire_medicament,
+                forma_farmaceutica, posologie, data_incepere, data_ultima_prescriere
+            )
+            VALUES (
+                @cnp_doctor, @cnp_pacient, @denumire_medicament,
+                @forma_farmaceutica, @posologie, @data_incepere, @data_ultima_prescriere
+            )
+        `);
+        }
+
+
         res.status(201).json({ message: 'Consultația a fost salvată.' });
     } catch (err) {
         console.error("Eroare salvare:", err);
         res.status(500).json({ message: 'Eroare la salvare în baza de date.' });
     }
 });
+
+app.get('/api/date-monitorizare', async (req, res) => {
+    const { cnp, perioada } = req.query;
+
+    if (!cnp || !perioada) {
+        return res.status(400).json({ error: 'Parametrii lipsă: cnp sau perioada' });
+    }
+
+    let nrZile = 7;
+    if (perioada.endsWith('z')) {
+        nrZile = parseInt(perioada);
+    } else if (perioada.endsWith('l')) {
+        nrZile = parseInt(perioada) * 30;
+    }
+
+    try {
+        const pool = await sql.connect(config);
+        const result = await pool.request()
+            .input('cnp', sql.VarChar, cnp)
+            .input('dataLimita', sql.DateTime, new Date(Date.now() - nrZile * 24 * 60 * 60 * 1000))
+            .query(`
+                SELECT
+                masurare_puls,
+                masurare_umiditate,
+                masurare_temperatura,
+                data_masurare
+                FROM masuratori
+                WHERE cnp_pacient = @cnp AND data_masurare >= @dataLimita
+                ORDER BY data_masurare ASC
+            `);
+
+        res.json(result.recordset);
+    } catch (err) {
+        console.error('Eroare DB:', err);
+        res.status(500).json({ error: 'Eroare server sau conexiune SQL' });
+    }
+});
+
+
+const { sharePatientToFhir } = require('./utils/fhirService');
+
+app.post('/api/pacienti/:id/share-fhir', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await sql.connect(config);
+        const result = await sql.query`SELECT * FROM Pacienti WHERE CNP = ${id}`;
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Pacientul nu a fost găsit' });
+        }
+
+        const pacient = result.recordset[0];
+
+        const rezultatFhir = await sharePatientToFhir(pacient);
+
+        res.json({ success: true, message: 'Pacient partajat cu succes în FHIR.', rezultatFhir });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Eroare la partajare FHIR.' });
+    }
+});
+
 
 function verificaAlerte(valori, praguri) {
   const alerte = [];

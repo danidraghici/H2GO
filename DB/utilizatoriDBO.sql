@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[utilizatori]    Script Date: 08.06.2025 18:40:45 ******/
+/****** Object:  Table [dbo].[utilizatori]    Script Date: 09.06.2025 12:12:59 ******/
 SET ANSI_NULLS ON
 GO
 

@@ -44,6 +44,25 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
+         .tratamente-grid {
+             display: flex;
+             flex-direction: column;
+             gap: 10px;
+         }
+
+        .tratament-item {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 2fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .tratament-item input,
+        .tratament-item select {
+            padding: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -63,8 +82,6 @@
         <label for="trimiteri">Trimiteri (analize, spital etc.):</label>
         <textarea id="trimiteri" name="trimiteri"></textarea>
 
-        <label for="retete">Rețete:</label>
-        <textarea id="retete" name="retete"></textarea>
     </div>
 
     <div class="section">
@@ -75,6 +92,14 @@
         <label for="indicatii">Alte indicații:</label>
         <textarea id="indicatii" name="indicatii"></textarea>
     </div>
+
+    <div id="tratamenteContainer" class="section">
+        <h3>Tratament</h3>
+        <div id="tratamenteList" class="tratamente-grid"></div>
+        <button type="button" onclick="adaugaTratament()">➕ Adaugă Medicament</button>
+    </div>
+
+
 
     <button type="submit">Salvează Consultația</button>
 </form>
