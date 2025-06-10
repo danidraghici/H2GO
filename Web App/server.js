@@ -29,13 +29,14 @@ app.post('/api/login', async (req, res) => {
 
     try {
         await sql.connect(config);
-        const result = await sql.query`SELECT * FROM Utilizatori WHERE Email = ${email}`;
+        const result = await sql.query`SELECT * FROM Utilizatori WHERE email = ${email}`;
 
         if (result.recordset.length === 0) {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
         const user = result.recordset[0];
+
         const passwordMatch = await bcrypt.compare(password, user.parola_hash);
 
         if (!passwordMatch) {
@@ -44,7 +45,7 @@ app.post('/api/login', async (req, res) => {
 
         // const token = jwt.sign({ id: user.ID, email: user.Email }, JWT_SECRET, { expiresIn: '1h' });
 
-        res.status(200).json({ success: true, user: { id: user.ID, email: user.Email, userType: user.rol, cnp: user.CNP } });
+        res.status(200).json({ success: true, user: { id: user.id, username: user.username, email: user.email, userType: user.rol, cnp: user.CNP } });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
@@ -267,6 +268,7 @@ app.get('/api/masuratori/:cnp', async (req, res) => {
                 } : null
             };
         }
+        console.log(`Masuratori pentru CNP ${cnp}:`, masuratori);
         res.json(masuratori);
     } catch (err) {
         console.error(err);
@@ -733,5 +735,409 @@ app.post('/api/pacienti/:id/share-fhir', async (req, res) => {
     }
 });
 
+
+function verificaAlerte(valori, praguri) {
+  const alerte = [];
+console.log(`praguri func: ${JSON.stringify(praguri)}`);
+  function verifica(label, val, min, max, severitateDacaDepaseste) {
+    if (val < min || val > max) {
+      return {
+        mesaj: `${label} iesit din limite: ${val} (limite: ${min} - ${max})`,
+        severitate: severitateDacaDepaseste
+      };
+    }
+    return null;
+  }
+
+  const alertaPuls = verifica("Puls", valori.puls, praguri.limita_minima_puls, praguri.limita_maxima_puls, valori.puls > praguri.limita_maxima_puls ? "mare" : "medie");
+  if (alertaPuls) alerte.push(alertaPuls);
+
+  const alertaTemp = verifica("Temperatura", valori.temperatura, praguri.limita_minima_temperatura, praguri.limita_maxima_temperatura, "medie");
+  if (alertaTemp) alerte.push(alertaTemp);
+
+//   const alertaEKG = verifica("EKG", valori.ekg, praguri.min_ekg, praguri.max_ekg, "mare");
+//   if (alertaEKG) alerte.push(alertaEKG);
+
+  const alertaUmiditate = verifica("Umiditate", valori.umiditate, praguri.limita_minima_umiditate, praguri.limita_maxima_umiditate, "mica");
+  if (alertaUmiditate) alerte.push(alertaUmiditate);
+
+  return alerte;
+}
+
+
+app.post('/api/insert', async (req, res) => {
+  const { cnp, masurare_ekg, masurare_puls, masurare_umiditate, masurare_temperatura } = req.body;
+
+const ekg = masurare_ekg;
+const puls = masurare_puls;
+const uminditate = masurare_umiditate;
+const temperatura = masurare_temperatura;
+  try {
+    await sql.connect(config);
+
+    // Ia CNP pe baza emailului
+    // const result = await sql.query`SELECT CNP FROM utilizatori WHERE email = ${email}`;
+    // if (result.recordset.length === 0) {
+    //   return res.status(404).json({ message: 'Utilizator inexistent' });
+    // }
+// console.log(result);
+    // const cnp = result.recordset[0].CNP;
+// console.log(cnp); // ➡️ '6020220234523'
+
+    const timestamp = new Date().toISOString();
+    function generateRandomId() {
+  return Math.floor(100000 + Math.random() * 900000);
+
+}
+
+console.log(`CNP: ${cnp}`);
+let id1 = generateRandomId();
+   const praguriResult = await sql.query(`
+   SELECT TOP (1) *
+            FROM praguri_masuratori
+            WHERE cnp_pacient = ${cnp}
+`);
+const praguri = praguriResult.recordset[0];
+console.log(`praguri: ${JSON.stringify(praguri)}`);
+if (!praguri) {
+  throw new Error("Pragurile nu au fost găsite pentru pacientul cu CNP: " + cnp);
+}
+
+
+   const result = await sql.query(`
+      INSERT INTO masuratori (cnp_pacient, masurare_ekg, masurare_puls,masurare_umiditate, masurare_temperatura, data_masurare)
+      OUTPUT INSERTED.id AS masurare_id
+      VALUES
+        ('${cnp}',${ekg}, ${puls}, ${uminditate}, ${temperatura}, '${timestamp}')
+    `);
+const insertedId = result.recordset[0].masurare_id;
+
+console.log('Inserted ID:', insertedId); // Verifică ID-ul inserat
+const valori = {
+  puls: puls,
+  temperatura: temperatura,
+  ekg: ekg,
+  umiditate: uminditate
+};
+
+const alerteGenerate = verificaAlerte(valori, praguri);
+console.log(alerteGenerate);
+// const alerte = [];
+
+// const pulseAlert = verifica("Puls", puls, praguri.min_puls, praguri.max_puls);
+// console.log(`pulseAlert: ${JSON.stringify(pulseAlert)}`);
+// if (pulseAlert) alerte.push(pulseAlert);
+
+// const tempAlert = verifica("Temperatura", temperatura, praguri.min_temp, praguri.max_temp);
+// if (tempAlert) alerte.push(tempAlert);
+
+// etc. pentru celelalte
+// console.log(`Alerte: ${JSON.stringify(alerte)}`);
+for (const alerta of alerteGenerate) {
+  await sql.query(`
+    INSERT INTO alerte (cnp_pacient, masurare_id, mesaj, severitate, status, data_generare)
+    VALUES ('${cnp}', ${insertedId}, '${alerta.mesaj}', '${alerta.severitate}', 'necitita', GETDATE())
+  `);
+}
+res.json({
+  message: 'Valori salvate',
+  masurare_id: insertedId,
+  alerteGenerate: alerteGenerate
+});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Eroare la salvare' });
+  }
+});
+
+
+
+app.get('/api/history', async (req, res) => {
+  const { hours = 24, userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'Parametrul userId este necesar' });
+  }
+
+  try {
+    await sql.connect(config);
+
+    const result = await sql.query`
+      SELECT timp, puls, temperatura, glicemie
+      FROM Masuratori
+      WHERE timp >= DATEADD(HOUR, -${hours}, GETDATE()) AND user_id = ${userId}
+      ORDER BY timp ASC
+    `;
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare API history:', err);
+    res.status(500).json({ error: 'Eroare server' });
+  }
+});
+
+app.post('/api/login/mobile', async (req, res) => {
+  const { email, password } = req.body;
+  await sql.connect(config);
+
+  try {
+    // 1. Caută userul după email
+    const result = await sql.query`
+      SELECT *
+      FROM utilizatori
+      WHERE email = ${email}
+    `;
+
+    if (result.recordset.length === 0) {
+      return res.status(401).json({ success: false, message: 'Email inexistent' });
+    }
+
+    const user = result.recordset[0];
+    console.log(`User găsit: ${JSON.stringify(user)}`);
+    console.log(password, user.parola_hash);
+    const passwordMatch = await bcrypt.compare(password, user.parola_hash);
+    console.log(`Parola comparată: ${passwordMatch}`);
+    if (!passwordMatch) {
+      return res.status(401).json({ success: false, message: 'Parolă incorectă' });
+    }
+
+    let additionalData = {};
+
+    // 2. În funcție de rol, ia datele specifice
+    switch (user.rol) {
+      case 'pacient':
+        const pacientData = await sql.query`
+          SELECT *
+          FROM Pacienti
+          WHERE cnp = ${user.CNP}
+        `;
+        console.log(`CNP pacient: ${user.cnp}`);
+        console.log(`Pacient data: ${JSON.stringify(pacientData.recordset)}`);
+        if (pacientData.recordset.length > 0) {
+          additionalData = pacientData.recordset[0];
+        }
+        console.log(`Pacient data: ${JSON.stringify(additionalData)}`);
+        break;
+
+      case 'ingrijitor':
+        const ingrijitorData = await sql.query`
+          SELECT *
+          FROM Ingrijitori
+          WHERE cnp_ingrijitor = ${user.CNP}
+        `;
+        console.log(user.CNP);
+        console.log(`Ingrijitor data: ${JSON.stringify(ingrijitorData.recordset)}`);
+        if (ingrijitorData.recordset.length > 0) {
+          additionalData = ingrijitorData.recordset[0];
+        }
+        break;
+      default:
+        return res.status(400).json({ success: false, message: 'Rol necunoscut' });
+    }
+
+    // 3. Trimite înapoi totul
+    return res.status(200).json({
+      success: true,
+      message: 'Autentificare reușită',
+      user: {
+        email: user.email,
+        cnp: user.cnp,
+        rol: user.rol,
+        username: user.username || user.nume || '',
+        ...additionalData,
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Eroare la login:", err);
+    return res.status(500).json({ success: false, message: 'Eroare server' });
+  }
+});
+
+
+app.get('/api/praguriPacient/:cnp', async (req, res) => {
+ const cnp = req.params.cnp;
+
+    try {
+        await sql.connect(config);
+        const result = await sql.query`
+            SELECT TOP (1) *
+            FROM praguri_masuratori
+            WHERE cnp_pacient = ${cnp}
+        `;
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Praguri inexistente pentru acest pacient.' });
+        }
+        console.log('PRAGURI',result);
+        res.status(200).json({ success: true, praguri: result.recordset[0] });
+    } catch (err) {
+        console.error('Eroare SQL:', err);
+        res.status(500).json({ success: false, message: 'Eroare de server la preluarea pragurilor.' });
+    }
+});
+
+
+// POST alerta noua
+app.post('/api/alertaNoua', async (req, res) => {
+  const {
+    cnp_pacient,
+    masurare_id,
+    mesaj,
+    severitate,
+    status,
+    data_generare
+  } = req.body;
+
+
+   function generateRandomId() {
+  return Math.floor(100000 + Math.random() * 900000); }// 6 cifre random
+  let id1 = generateRandomId();
+ try {
+        await sql.connect(config);
+         const result = await sql.query(`
+      INSERT INTO alerte (
+        cnp_pacient,
+        masurare_id,
+        mesaj,
+        severitate,
+        status,
+        data_generare
+      ) VALUES (
+        '${cnp_pacient}',
+      ${masurare_id},
+      '${mesaj}',
+      '${severitate}',
+      '${status}',
+      '${data_generare}'
+      )
+    `);
+
+        console.log(result);
+        res.status(200).json({ success: true, praguri: result.recordset[0] });
+    } catch (err) {
+        console.error('Eroare SQL:', err);
+        res.status(500).json({ success: false, message: 'Eroare de server la preluarea pragurilor.' });
+    }
+});
+
+// Get appointments
+app.get('/api/programariPerPacient/:cnp', async (req, res) => {
+  const { cnp } = req.params;
+  try {
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.input('cnp', sql.Char(13), cnp);
+    const result = await request.query(`
+      SELECT 
+        p.id, p.data_programare, p.status, p.comentarii, 
+        c.id_consultatie, c.diagnostic, c.tratament, c.data_consultatie
+      FROM programari p
+      LEFT JOIN consultatii c ON p.id = c.id_programare
+      WHERE p.cnp_pacient = @cnp
+      ORDER BY p.data_programare DESC
+    `);
+    res.json(result.recordset);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Eroare la încărcarea programărilor');
+  }
+});
+
+// Get consultatie
+app.get('/api/programari/:id/consultatie', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.input('id', sql.Int, id);
+    const result = await request.query(`
+      SELECT *
+      FROM consultatii
+      WHERE id_programare = @id
+    `);
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'Consultatie inexistentă' });
+    }
+    res.json(result.recordset[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Eroare la încărcarea consultatiei');
+  }
+});
+
+
+// GET /api/medicatie_curenta/:cnp
+app.get('/api/medicatie_curenta/:cnp', async (req, res) => {
+  const { cnp } = req.params;
+  try {
+    await sql.connect(config);
+    const result = await sql.query(`
+      SELECT cnp_doctor, cnp_pacient, denumire_medicament, forma_farmaceutica, posologie, data_incepere, data_ultima_prescriere, id
+      FROM medicatie_curenta
+      WHERE cnp_pacient = '${cnp}'
+    `);
+    console.log('MEDICATIE',result);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare medicatie curenta:', err);
+    res.status(500).json({ message: 'Eroare server medicatie curenta' });
+  }
+});
+
+// GET /api/alergeni/:cnp
+app.get('/api/alergeni/:cnp', async (req, res) => {
+  const { cnp } = req.params;
+  try {
+    await sql.connect(config);
+    const result = await sql.query(`
+      SELECT id, cnp_pacient, substanta, status, data_inregistrare, cnp_doctor
+      FROM alergeni
+      WHERE cnp_pacient = '${cnp}'
+    `);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare alergeni:', err);
+    res.status(500).json({ message: 'Eroare server alergeni' });
+  }
+});
+
+// GET /api/istoric_medicatie/:cnp
+app.get('/api/istoric_medicatie/:cnp', async (req, res) => {
+  const { cnp } = req.params;
+  try {
+    await sql.connect(config);
+    const result = await sql.query(`
+      SELECT cnp_doctor, cnp_pacient, denumire_medicament, forma_farmaceutica, posologie, data_incepere, data_finalizare, motiv_intrerupere, id
+      FROM istoric_medicatie
+      WHERE cnp_pacient = '${cnp}'
+    `);
+    console.log('ISTORIC MEDICATIE', result);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare istoric:', err);
+    res.status(500).json({ message: 'Eroare server istoric medicatie' });
+  }
+});
+
+// GET /api/alerte/:cnp
+app.get('/api/alerte/:cnp', async (req, res) => {
+  const { cnp } = req.params;
+
+  try {
+    await sql.connect(config);
+    const result = await sql.query(`
+      SELECT id, mesaj, severitate, status, data_generare
+      FROM alerte
+      WHERE cnp_pacient = '${cnp}'
+      ORDER BY data_generare DESC
+    `);
+console.log('ALERTE', result);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("❌ Eroare la interogare alerte:", err);
+    res.status(500).json({ message: 'Eroare la încărcarea alertelor.' });
+  }
+});
 
 app.listen(3000, () => console.log('API server running on port 3000'));
