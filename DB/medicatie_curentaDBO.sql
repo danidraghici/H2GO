@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[medicatie_curenta]    Script Date: 23.05.2025 18:53:35 ******/
+/****** Object:  Table [dbo].[medicatie_curenta]    Script Date: 08.06.2025 18:31:58 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -6,7 +6,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[medicatie_curenta](
-	[id] [uniqueidentifier] NOT NULL,
 	[cnp_doctor] [char](13) NOT NULL,
 	[cnp_pacient] [char](13) NOT NULL,
 	[denumire_medicament] [varchar](100) NOT NULL,
@@ -14,7 +13,8 @@ CREATE TABLE [dbo].[medicatie_curenta](
 	[posologie] [text] NULL,
 	[data_incepere] [date] NOT NULL,
 	[data_ultima_prescriere] [date] NOT NULL,
- CONSTRAINT [PK_medicatie_curenta] PRIMARY KEY CLUSTERED 
+	[id] [int] IDENTITY(1,1) NOT NULL,
+ CONSTRAINT [pk_nume_tabela] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
@@ -28,10 +28,10 @@ GO
 ALTER TABLE [dbo].[medicatie_curenta] CHECK CONSTRAINT [FK_CNP_DOCTOR_MEDICATIE]
 GO
 
-ALTER TABLE [dbo].[medicatie_curenta]  WITH CHECK ADD  CONSTRAINT [FK_CNP_PACIENT_MEDICATIE] FOREIGN KEY([cnp_pacient])
+ALTER TABLE [dbo].[medicatie_curenta]  WITH CHECK ADD  CONSTRAINT [FK_medicatie_curenta_pacienti] FOREIGN KEY([cnp_pacient])
 REFERENCES [dbo].[pacienti] ([CNP])
 GO
 
-ALTER TABLE [dbo].[medicatie_curenta] CHECK CONSTRAINT [FK_CNP_PACIENT_MEDICATIE]
+ALTER TABLE [dbo].[medicatie_curenta] CHECK CONSTRAINT [FK_medicatie_curenta_pacienti]
 GO
 

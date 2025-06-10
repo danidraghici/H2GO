@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[permisiuni]    Script Date: 21.05.2025 18:10:55 ******/
+/****** Object:  Table [dbo].[permisiuni]    Script Date: 08.06.2025 18:33:00 ******/
 SET ANSI_NULLS ON
 GO
 

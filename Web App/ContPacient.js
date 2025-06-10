@@ -8,10 +8,14 @@ signupForm.addEventListener('submit', async (e) => {
   const prenume = signupForm['prenume'].value.trim();
   const password = signupForm['password'].value;
 
-  const username = `${nume} ${prenume}`;
   const telefon = signupForm['telefon']?.value || '';
   const rol = 'pacient';
-  const id_permisiune = 1;
+  const cnpMedic = localStorage.getItem('cnpMedic');
+
+  const sex = signupForm['sex'].value.trim();
+  const data_nasterii = signupForm['data_nasterii'].value;
+  const adresa = signupForm['adresa'].value.trim();
+
 
   if (!cnp || !email || !nume || !prenume || !password) {
     alert('Te rog completează toate câmpurile obligatorii.');
@@ -19,16 +23,16 @@ signupForm.addEventListener('submit', async (e) => {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/register', {
+    const response = await fetch('http://localhost:3000/api/addPacienti', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cnp, username, email, telefon, password, rol, id_permisiune })
+      body: JSON.stringify({ cnp, nume, prenume, sex, data_nasterii, adresa, telefon, email, password, rol, cnpMedic })
     });
 
     const result = await response.json();
 
     if (result.success) {
-      window.location = 'WelcomePacient.html';
+      window.location.href = 'Pacienti.html';
     } else {
       alert(result.message || 'Înregistrarea a eșuat.');
     }

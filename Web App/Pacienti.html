@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Pacienții Mei</title>
+    <link rel="stylesheet" href="./css/Pacienti.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<h1>Pacienții Mei
+    <div class="e4_90" style="display: flex">
+        <a href="WelcomeMedic.html">
+            <button class="e4_92" style="padding-left: 20px">Acasa</button>
+        </a>
+        <a href="ContPacient.html" class="e4_91">
+            <button class="e4_92" style="margin-left: 1650px">Creare cont pacient</button>
+        </a>
+    </div></h1>
+
+
+
+<input type="text" id="searchInput" placeholder="Caută după nume..." />
+
+
+<table id="patientsTable" style="width: 100%">
+    <thead>
+    <tr>
+        <th>CNP</th>
+        <th>Nume</th>
+        <th>Prenume</th>
+        <th>Sex</th>
+        <th>Data nașterii</th>
+        <th>Adresă</th>
+        <th>Telefon</th>
+        <th>Email</th>
+        <th>Ultima Programare</th>
+        <th>Ultimul Tratament</th>
+        <th>Status Activ</th>
+        <th>Acțiuni</th>
+    </tr>
+    </thead>
+    <tbody id="patientsList">
+    </tbody>
+</table>
+
+<div id="paginationControls">
+    <button id="prevPage">Anterior</button>
+    <span id="currentPage">Pagina 1</span>
+    <button id="nextPage">Următor</button>
+</div>
+
+<!-- Modal pentru editare -->
+<div class="modal" id="editModal">
+    <h2>Editează pacient
+        <button onclick="closeModal()" style="margin-left: 1650px">X</button>
+    </h2>
+    <form id="editForm">
+
+        <!-- Detalii pacient -->
+        <div class="section">
+            <h4>Detalii pacient</h4>
+            <button onclick="partajeazaFHIR()">Partajează FHIR</button>
+            <label>CNP: <input type="text" id="editCNP" disabled></label>
+            <label>Nume: <input type="text" id="editNume"></label>
+            <label>Prenume: <input type="text" id="editPrenume"></label>
+            <label>Data nașterii: <input type="date" id="editDataNasterii" disabled></label>
+            <label>Sex:
+                <select id="editSex" disabled>
+                    <option value="M">Masculin</option>
+                    <option value="F">Feminin</option>
+                </select>
+            </label>
+            <label>Adresă: <input type="text" id="editAdresa"></label>
+            <label>Email: <input type="text" id="editEmail"></label>
+            <label>Telefon: <input type="text" id="editTelefon"></label>
+        </div>
+
+        <!-- Date specificate medic-->
+        <div class="section">
+            <h4>Date conform ultimelor consultatii</h4>
+        <label>Status: <select id="editStatus">
+            <option value="1">Activ</option>
+            <option value="0">Inactiv</option>
+        </select>
+        </label>
+        <table id="tabelPraguri">
+            <thead>
+            <tr>
+                <th>Puls (min - max)</th>
+                <th>Temperatură (min - max)</th>
+                <th>Umiditate (min - max)</th>
+                <th>EKG (min - max)</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table></div>
+
+        <button type="submit">Salvează</button>
+
+        <!-- Date monitorizate -->
+        <div class="section">
+            <h4>Date monitorizate de senzori</h4>
+           <p> Stare pacient: <span id="clasificareBoala" className="text-lg font-semibold text-blue-600">
+            </span>
+           </p>
+            <button type="button" onclick="deschidePopupGrafic()">Istoric Masuratori</button>
+            <p>Puls: <span id="pulseVal"></span> bpm</p>
+            <p>Temperatură: <span id="tempVal"></span> °C</p>
+            <p>Umiditate: <span id="humidityVal"></span> %</p>
+            <canvas id="ecgChart"></canvas>
+        </div>
+
+        <!-- Ultima consultatie -->
+        <div class="section">
+            <h4>Ultima programare și consultație</h4>
+            <p>Data: <span id="ultimaConsultatieData"></span></p>
+            <p>Diagnostic preliminar: <span id="diagnosticPreliminar"></span></p>
+            <p>Observații: <span id="observatii"></span></p>
+            <p>Recomandări: <span id="recomandari"></span></p>
+            <button onclick="adaugaConsultatie()">Adauga Consultatie</button>
+        </div>
+
+        <!-- Ultimul tratament -->
+        <div class="section">
+            <h4>Ultimul tratament</h4>
+            <p>Medicament: <span id="medicament"></span></p>
+            <p>Formă farmaceutică: <span id="formaFarmaceutica"></span></p>
+            <p>Posologie: <span id="posologie"></span></p>
+            <p>Ultima prescriere: <span id="ultimaPrescriere"></span></p>
+        </div>
+
+    </form>
+    <div id="popupGrafic" class="modal-grafic" style="display: none">
+        <h3>Selectează perioada de afișare</h3>
+        <select id="perioadaSelect">
+            <option value="5z">5 zile</option>
+            <option value="7z">7 zile</option>
+            <option value="10z">10 zile</option>
+            <option value="1l">1 lună</option>
+            <option value="3l">3 luni</option>
+            <option value="5l">5 luni</option>
+            <option value="7l">7 luni</option>
+            <option value="9l">9 luni</option>
+            <option value="12l">12 luni</option>
+        </select>
+        <br><br>
+        <button onclick="genereazaGrafic()">Generează grafic</button>
+        <button onclick="descarcaExcel()">Descarcă Excel</button>
+        <button onclick="inchidePopupGrafic()">Închide</button>
+
+        <canvas id="graficDate"></canvas>
+    </div>
+
+</div>
+
+<script src="Pacienti.js"></script>
+</body>
+</html>
