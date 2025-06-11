@@ -118,7 +118,6 @@ async function sharePatientToFhir(pacient) {
 
         result.entry.forEach(e => {
             if (e.response && e.response.location) {
-                // ex: "Patient/abc-123", "MedicationRequest/xyz-456"
                 const [resourceType, resourceId] = e.response.location.split('/');
                 urls[resourceType] = urls[resourceType] || [];
                 urls[resourceType].push(`https://hapi.fhir.org/baseR4/${resourceType}/${resourceId}`);
