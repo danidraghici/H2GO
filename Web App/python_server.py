@@ -14,19 +14,19 @@ np.random.seed(0)
 num_samples = 300
 
 def generate_data(n, label):
-    if label == "sanatos":
+    if label == "Bradicardie":
         return np.hstack((
             np.random.normal(70, 5, (n, 1)),        # Puls
             np.random.normal(36.8, 0.2, (n, 1)),    # Temp
             np.random.normal(50, 10, (n, 1))        # Umiditate
         )), [[1, 0, 0]] * n
-    elif label == "boala_usoara":
+    elif label == "Tahicardie":
         return np.hstack((
             np.random.normal(90, 10, (n, 1)),
             np.random.normal(38.0, 0.3, (n, 1)),
             np.random.normal(60, 10, (n, 1))
         )), [[0, 1, 0]] * n
-    else:  # boala_grava
+    else:
         return np.hstack((
             np.random.normal(110, 10, (n, 1)),
             np.random.normal(39.5, 0.5, (n, 1)),
